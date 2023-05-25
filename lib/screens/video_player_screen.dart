@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:anime_api/constants/app_colors.dart';
+import 'package:anime_api/util/app_colors.dart';
 import 'package:anime_api/helpers/http_helper.dart';
 import 'package:anime_api/providers/user_preferences.dart';
 import 'package:anime_api/screens/details_screen.dart';

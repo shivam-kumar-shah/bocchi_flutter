@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 
-import '../constants/app_colors.dart';
+import '../util/app_colors.dart';
 import '../helpers/http_helper.dart';
 import '../widgets/preferences_modal.dart';
 import '../widgets/search_card.dart';

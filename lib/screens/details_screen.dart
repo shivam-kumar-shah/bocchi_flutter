@@ -5,7 +5,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:html/parser.dart';
 import 'package:provider/provider.dart';
 
-import '../constants/app_colors.dart';
+import '../util/app_colors.dart';
 import '../helpers/custom_route.dart';
 import '../helpers/http_helper.dart';
 import '../screens/video_player_screen.dart';
@@ -16,7 +16,8 @@ import '../widgets/hero_image.dart';
 import '../widgets/info_pane.dart';
 
 class DetailsScreen extends StatefulWidget {
-  const DetailsScreen({super.key});
+  const DetailsScreen({super.key, required this.id});
+  final String id;
   static const routeName = "/details";
 
   @override

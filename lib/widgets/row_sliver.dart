@@ -1,4 +1,4 @@
-import 'package:anime_api/constants/app_colors.dart';
+import 'package:anime_api/util/app_colors.dart';
 
 import '../widgets/row_item.dart';
 import 'package:flutter/material.dart';

@@ -12,7 +12,7 @@ import 'package:provider/provider.dart';
 
 import './screens/details_screen.dart';
 import './screens/home_screen.dart';
-import 'constants/app_colors.dart';
+import 'util/app_colors.dart';
 
 void main() {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();

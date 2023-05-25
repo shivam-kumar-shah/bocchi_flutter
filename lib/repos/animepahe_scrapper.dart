@@ -1,11 +1,14 @@
 import 'dart:convert';
 
-import 'package:http/http.dart';
+import 'package:anime_api/models/episode.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:http/http.dart' show get;
 import 'package:html/parser.dart' as html;
+
+import '../models/source.dart';
 
 class AnimeScrapper {
   static const _baseUrl = "animepahe.ru";
-  // static const _apiUrl = "anime-api-vnkr.onrender.com";
   static const _apiUrl = "relieved-cyan-tuxedo.cyclic.app";
   static const _headers = {
     "User-Agent":
@@ -54,14 +57,12 @@ class AnimeScrapper {
     }
   }
 
-  static Future<Map<String, dynamic>> fetchAnimepaheEpisodes({
+  static Future<List<Episode>> fetchAnimepaheEpisodes({
     required String animeId,
     required int page,
   }) async {
     if (animeId == "") {
-      return {
-        "error": "No anime found",
-      };
+      return [];
     }
 
     final url = Uri.https(_baseUrl, "/api", {
@@ -71,26 +72,15 @@ class AnimeScrapper {
       "page": page.toString(),
     });
     final response = await get(url);
-    return json.decode(response.body);
-    // final responseBody = json.decode(response.body)["data"] as List<dynamic>;
-    // final episodeList = responseBody.map((ep) {
-    //   return {
-    //     "epNum": ep["episode"],
-    //     "episodeId": ep["session"],
-    //     "thumbnail": ep["snapshot"],
-    //     "duration": ep["duration"],
-    //     "isBD": ep["disc"] == "BD" ? true : false,
-    //   };
-    // }).toList();
-
-    // return episodeList;
+    final List<Map<String, dynamic>> data = json.decode(response.body)["data"];
+    return data.map((dataMap) => Episode.fromJSON(dataMap: dataMap)).toList();
   }
 
-  static Future<List<Map<String, String>>> fetchAnimepaheEpisodesSources({
-    required String animeId,
-    required String episodeId,
+  static Future<List<Source>> fetchAnimepaheEpisodesSources({
+    required String animeID,
+    required String episodeID,
   }) async {
-    final url = Uri.https(_baseUrl, "/play/$animeId/$episodeId");
+    final url = Uri.https(_baseUrl, "/play/$animeID/$episodeID");
     try {
       final response = await get(url);
       final parsedResponse = html.parse(response.body);
@@ -133,8 +123,14 @@ class AnimeScrapper {
           "streamInfo": streamInfoList![i].firstChild?.text ?? "",
         };
       }
-      return sourceList ?? [{}];
+      return sourceList
+              ?.map((dataMap) => Source.fromJSON(dataMap: dataMap))
+              .toList() ??
+          [];
     } catch (err) {
+      if (kDebugMode) {
+        print(err);
+      }
       rethrow;
     }
   }
