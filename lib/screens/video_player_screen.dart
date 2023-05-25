@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:anime_api/models/anime.dart';
+import 'package:anime_api/repos/api_repo.dart';
 import 'package:anime_api/util/app_colors.dart';
 import 'package:anime_api/helpers/http_helper.dart';
 import 'package:anime_api/providers/user_preferences.dart';
@@ -12,23 +14,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 
+import '../models/episode.dart';
+
 class VideoPlayerScreen extends StatefulWidget {
-  final String id;
-  final String image;
+  final Anime anime;
   final int episode;
-  final List<dynamic> episodeList;
-  final String animeId;
+  final List<Episode> episodeList;
   final int position;
-  final Map<String, dynamic> title;
   const VideoPlayerScreen({
     super.key,
-    required this.id,
-    required this.image,
     required this.episode,
     required this.episodeList,
     this.position = 0,
-    required this.title,
-    required this.animeId,
+    required this.anime,
   });
   static const routeName = "/watch";
 
@@ -68,10 +66,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       );
     }
     try {
-      final response = await HttpHelper.getVideoSources(
+      final response = await APIRepo.getVideoSources(
         episodeID: widget.episodeList.firstWhere(
             (element) => element["episode"] == currentEpisode)["session"],
-        animeId: widget.animeId,
+        animeID: widget.animeId,
       );
       setState(() {
         videoSources = response;
@@ -235,8 +233,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                               height: 3,
                             ),
                             Text(
-                              widget.title[prefferedTitle.name] ??
-                                  widget.title[subtitle.name],
+                              // widget.title[prefferedTitle.name] ??
+                              //     widget.title[subtitle.name],
+                              widget.title.jpTitle,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: Theme.of(context)

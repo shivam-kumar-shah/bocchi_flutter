@@ -1,5 +1,8 @@
 import 'dart:convert';
 
+import 'package:anime_api/models/anime.dart';
+import 'package:anime_api/models/episode.dart';
+import 'package:anime_api/repos/api_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:html/parser.dart';
@@ -16,8 +19,11 @@ import '../widgets/hero_image.dart';
 import '../widgets/info_pane.dart';
 
 class DetailsScreen extends StatefulWidget {
-  const DetailsScreen({super.key, required this.id});
-  final String id;
+  const DetailsScreen({
+    super.key,
+    required this.anime,
+  });
+  final Anime anime;
   static const routeName = "/details";
 
   @override
@@ -26,13 +32,13 @@ class DetailsScreen extends StatefulWidget {
 
 class _DetailsScreenState extends State<DetailsScreen>
     with TickerProviderStateMixin {
-  Map<String, dynamic>? fetchedData;
-  String? animeId;
-  List<dynamic>? episodeList;
+  Anime? fetchedAnime;
+  List<Episode>? episodeList;
+
   bool hasError = false;
+  bool isLoading = false;
+  bool isDescending = false;
   String? errorMessage;
-  bool loadingEpisode = false;
-  bool descending = false;
 
   late final AnimationController _animationController = AnimationController(
       vsync: this, duration: const Duration(milliseconds: 500))
@@ -43,55 +49,43 @@ class _DetailsScreenState extends State<DetailsScreen>
   );
 
   void fetchEpisodeList() async {
+    if (fetchedAnime == null) return;
+    setState(() {
+      isLoading = true;
+    });
     try {
-      List<dynamic> tempList = [];
-      int nextPage = 1;
+      final anime = fetchedAnime!;
+      final episodes = await APIRepo.getAllEpisodes(
+        title: anime.title,
+        releasedYear: anime.year,
+        season: anime.season,
+      );
       setState(() {
-        loadingEpisode = true;
-      });
-      while (nextPage != -1) {
-        final result = await HttpHelper.getEpisodeList(
-          title: fetchedData!["title"]["romaji"] ?? "Unknown",
-          releasedYear: fetchedData?["releaseDate"] ?? 0,
-          page: nextPage,
-        );
-        if (animeId == null) {
-          setState(() {
-            animeId = result["animeId"];
-          });
-        }
-        tempList = [...tempList, ...result["episodes"]["data"]];
-        nextPage = result["episodes"]["current_page"] ==
-                result["episodes"]["last_page"]
-            ? -1
-            : result["episodes"]["current_page"] + 1;
-      }
-      setState(() {
-        loadingEpisode = false;
-        episodeList = tempList;
+        episodeList = episodes;
       });
     } catch (err) {
       setState(() {
         hasError = true;
       });
     }
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
-  void getData() async {
+  void fetchData() async {
     try {
       setState(() {
         hasError = false;
       });
-      final result = await HttpHelper.getInfo(
-        malID: (int.parse(
-          (ModalRoute.of(context)?.settings.arguments
-              as Map<String, dynamic>)["id"],
-        )),
+      final result = await APIRepo.getInfo(
+        malID: widget.anime.id,
       );
       setState(() {
-        fetchedData = result;
+        fetchedAnime = result;
       });
-      if (episodeList == null) fetchEpisodeList();
+      fetchEpisodeList();
     } catch (err) {
       setState(() {
         hasError = true;
@@ -108,7 +102,7 @@ class _DetailsScreenState extends State<DetailsScreen>
 
   @override
   void didChangeDependencies() {
-    getData();
+    fetchData();
     super.didChangeDependencies();
   }
 
@@ -117,36 +111,35 @@ class _DetailsScreenState extends State<DetailsScreen>
     final history = Provider.of<Watchlist>(context).getHistory;
     int index = -1;
     bool isPresent = false;
-    if (fetchedData != null) {
-      index = history.indexWhere((item) => item["id"] == fetchedData!["id"]);
-      isPresent = !(Provider.of<Watchlist>(context).getWatchlist.indexWhere(
-                (element) => element["id"] == fetchedData!["id"],
-              ) ==
-          -1);
-    }
+    final anime = widget.anime;
+    // if (fetchedData != null) {
+    //   index = history.indexWhere((item) => item["id"] == fetchedData!["id"]);
+    //   isPresent = !(Provider.of<Watchlist>(context).getWatchlist.indexWhere(
+    //             (element) => element["id"] == fetchedData!["id"],
+    //           ) ==
+    //       -1);
+    // }
     return Scaffold(
-      floatingActionButton: fetchedData != null
-          ? FloatingActionButton(
-              onPressed: () async {
-                await Provider.of<Watchlist>(
-                  context,
-                  listen: false,
-                ).toggle(
-                  id: fetchedData!["id"],
-                  title: json.encode(fetchedData!["title"]),
-                  image: fetchedData!["image"],
-                );
-              },
-              tooltip: "Add to watchlist",
-              child: isPresent
-                  ? const Icon(
-                      Icons.done_rounded,
-                    )
-                  : const Icon(
-                      Icons.history_outlined,
-                    ),
-            )
-          : null,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          await Provider.of<Watchlist>(
+            context,
+            listen: false,
+          ).toggle(
+            id: anime.id,
+            title: anime.title.jpTitle,
+            image: anime.coverImg,
+          );
+        },
+        tooltip: "Add to watchlist",
+        child: isPresent
+            ? const Icon(
+                Icons.done_rounded,
+              )
+            : const Icon(
+                Icons.history_outlined,
+              ),
+      ),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -157,10 +150,8 @@ class _DetailsScreenState extends State<DetailsScreen>
                 children: [
                   Positioned.fill(
                     child: HeroImage(
-                      imageUrl: (ModalRoute.of(context)?.settings.arguments
-                          as Map<String, dynamic>)["image"],
-                      tag: (ModalRoute.of(context)?.settings.arguments
-                          as Map<String, dynamic>)["tag"],
+                      imageUrl: anime.coverImg,
+                      tag: anime.id,
                     ),
                   ),
                   Positioned.fill(
@@ -182,18 +173,13 @@ class _DetailsScreenState extends State<DetailsScreen>
                       ),
                     ),
                   ),
-                  if (fetchedData != null)
+                  if (fetchedAnime != null)
                     Positioned(
                       bottom: 0,
                       child: SizedBox(
                         width: MediaQuery.of(context).size.width,
                         child: InfoPane(
-                          status: fetchedData!["status"],
-                          episodes: fetchedData!["totalEpisodes"].toString(),
-                          season: fetchedData!["season"],
-                          genres: fetchedData!["genres"],
-                          releaseDate: fetchedData!["releaseDate"] ?? 0,
-                          title: fetchedData!["title"] ?? "Unknown",
+                          anime: fetchedAnime!,
                         ),
                       ),
                     ),
@@ -220,7 +206,7 @@ class _DetailsScreenState extends State<DetailsScreen>
                           foregroundColor: AppColors.green,
                           minimumSize: const Size(150, 45),
                         ),
-                        onPressed: getData,
+                        onPressed: fetchData,
                         child: const Text("Refresh"),
                       ),
                     ],
@@ -235,7 +221,7 @@ class _DetailsScreenState extends State<DetailsScreen>
                       const SizedBox(
                         height: 30,
                       ),
-                      if (fetchedData == null)
+                      if (fetchedAnime == null)
                         Center(
                           child: SpinKitFoldingCube(
                             color: Theme.of(context).colorScheme.primary,
@@ -252,14 +238,11 @@ class _DetailsScreenState extends State<DetailsScreen>
                                     CustomRoute(
                                       builder: (context) {
                                         return VideoPlayerScreen(
-                                          animeId: animeId ?? "",
-                                          title: fetchedData!["title"],
+                                          anime: fetchedAnime!,
                                           episodeList: episodeList!,
                                           episode: index != -1
                                               ? history[index]["episode"]
-                                              : data["episode"],
-                                          image: fetchedData!["image"],
-                                          id: fetchedData!["id"],
+                                              : data.episode,
                                           position: index != -1
                                               ? history[index]["position"]
                                               : 0,
@@ -277,78 +260,74 @@ class _DetailsScreenState extends State<DetailsScreen>
                         const SizedBox(
                           height: 30,
                         ),
-                        if (fetchedData!["description"] != null)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
-                            ),
-                            child: RichText(
-                              maxLines: 15,
-                              overflow: TextOverflow.ellipsis,
-                              text: TextSpan(
-                                text: "Overview: ",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium
-                                    ?.copyWith(
-                                      color: Colors.amber,
-                                      fontWeight: FontWeight.w900,
-                                      fontSize: 13,
-                                    ),
-                                children: [
-                                  TextSpan(
-                                    text: parse(fetchedData!["description"])
-                                        .body
-                                        ?.text as String,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium
-                                        ?.copyWith(
-                                          color: Colors.grey,
-                                          fontSize: 13,
-                                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0,
+                          ),
+                          child: RichText(
+                            maxLines: 15,
+                            overflow: TextOverflow.ellipsis,
+                            text: TextSpan(
+                              text: "Overview: ",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                    color: Colors.amber,
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 13,
                                   ),
-                                ],
-                              ),
+                              children: [
+                                TextSpan(
+                                  text: parse(fetchedAnime!.description)
+                                      .body
+                                      ?.text as String,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
+                                        color: Colors.grey,
+                                        fontSize: 13,
+                                      ),
+                                ),
+                              ],
                             ),
                           ),
+                        ),
                         const SizedBox(
                           height: 10,
                         ),
-                        if (fetchedData?["totalEpisodes"] != null)
-                          if (fetchedData?["totalEpisodes"] > 0)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8.0,
-                                vertical: 10,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0,
+                            vertical: 10,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Episodes",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .displayLarge
+                                    ?.copyWith(
+                                      fontSize: 24,
+                                    ),
                               ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Episodes",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .displayLarge
-                                        ?.copyWith(
-                                          fontSize: 24,
-                                        ),
-                                  ),
-                                  TextButton.icon(
-                                    onPressed: () {
-                                      setState(() {
-                                        descending = !descending;
-                                      });
-                                    },
-                                    icon: descending
-                                        ? Icon(Icons.arrow_upward_rounded)
-                                        : Icon(Icons.arrow_downward_rounded),
-                                    label: Text("Sort"),
-                                  ),
-                                ],
+                              TextButton.icon(
+                                onPressed: () {
+                                  setState(() {
+                                    isDescending = !isDescending;
+                                  });
+                                },
+                                icon: isDescending
+                                    ? Icon(Icons.arrow_upward_rounded)
+                                    : Icon(Icons.arrow_downward_rounded),
+                                label: Text("Sort"),
                               ),
-                            ),
+                            ],
+                          ),
+                        ),
                       ],
                     ],
                   ),
@@ -357,19 +336,16 @@ class _DetailsScreenState extends State<DetailsScreen>
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
-                  final data = descending
+                  final data = isDescending
                       ? episodeList![episodeList!.length - 1 - index]
                       : episodeList![index];
                   return InkWell(
                     onTap: () => Navigator.of(context).push(
                       CustomRoute(
                         builder: (context) => VideoPlayerScreen(
-                          title: fetchedData!["title"],
                           episodeList: episodeList!,
-                          animeId: animeId ?? "",
-                          episode: data["episode"],
-                          image: fetchedData!["image"],
-                          id: fetchedData!["id"],
+                          episode: data.episode,
+                          anime: fetchedAnime!,
                         ),
                       ),
                     ),
@@ -377,13 +353,8 @@ class _DetailsScreenState extends State<DetailsScreen>
                       width: MediaQuery.of(context).size.width,
                       height: 100,
                       child: CustomTile(
-                        image: data["snapshot"],
-                        episodeNumber: data["episode"].toString(),
-                        airDate: data["created_at"],
-                        description: data["disc"],
-                        duration: data["duration"],
-                        key: ValueKey(data["episode"]),
-                        title: data["title"],
+                        key: ValueKey(data.id),
+                        episode: data,
                       ),
                     ),
                   );
@@ -391,14 +362,14 @@ class _DetailsScreenState extends State<DetailsScreen>
                 childCount: episodeList?.length ?? 0,
               ),
             ),
-          if (loadingEpisode && !hasError)
+          if (isLoading && !hasError)
             SliverToBoxAdapter(
               child: SpinKitFadingFour(
                 color: Theme.of(context).colorScheme.primary,
               ),
             ),
-          if (fetchedData != null) ...[
-            if (fetchedData!["relations"].length != 0) ...[
+          if (fetchedAnime != null) ...[
+            if (fetchedAnime!.relations.isNotEmpty) ...[
               SliverToBoxAdapter(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -426,17 +397,13 @@ class _DetailsScreenState extends State<DetailsScreen>
                         scrollDirection: Axis.horizontal,
                         itemExtent: 170,
                         itemBuilder: (context, index) {
-                          final data = fetchedData!["relations"][index];
+                          final data = fetchedAnime!.relations[index];
                           return SizedBox(
                             child: Stack(
                               children: [
                                 RowItem(
-                                  title: data["title"],
-                                  tag: data["id"].toString(),
-                                  image: data["image"],
-                                  id: data["id"].toString(),
-                                  disabled: data["episodes"] == null ||
-                                      data["malId"] == null,
+                                  anime: anime,
+                                  callback: () {},
                                 ),
                                 Positioned(
                                   top: 20,
@@ -454,11 +421,7 @@ class _DetailsScreenState extends State<DetailsScreen>
                                         vertical: 3,
                                       ),
                                       child: Text(
-                                        data["relationType"][0] +
-                                            data["relationType"]
-                                                .toString()
-                                                .toLowerCase()
-                                                .substring(1),
+                                        data.relationType ?? "",
                                         style: Theme.of(context)
                                             .textTheme
                                             .titleMedium,
@@ -470,14 +433,14 @@ class _DetailsScreenState extends State<DetailsScreen>
                             ),
                           );
                         },
-                        itemCount: fetchedData!["relations"].length,
+                        itemCount: fetchedAnime!.relations.length,
                       ),
                     ),
                   ],
                 ),
               ),
             ],
-            if (fetchedData!["recommendations"].length != 0) ...[
+            if (fetchedAnime!.recommendations.isNotEmpty) ...[
               SliverToBoxAdapter(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -505,21 +468,13 @@ class _DetailsScreenState extends State<DetailsScreen>
                         scrollDirection: Axis.horizontal,
                         itemExtent: 170,
                         itemBuilder: (context, index) {
-                          final data = fetchedData!["recommendations"][index];
+                          final data = fetchedAnime!.recommendations[index];
                           return SizedBox(
                             child: Stack(
                               children: [
                                 RowItem(
-                                  title: data["title"],
-                                  tag: data["id"].toString(),
-                                  image: data["image"] ?? "",
-                                  id: data["id"].toString(),
-                                  disabled: (data["status"]
-                                                  .toString()
-                                                  .toLowerCase() ==
-                                              "not yet aired" ||
-                                          data["malId"] == null) ||
-                                      data["episodes"] == null,
+                                  anime: anime,
+                                  callback: () {},
                                 ),
                                 Positioned(
                                   top: 20,
@@ -537,7 +492,7 @@ class _DetailsScreenState extends State<DetailsScreen>
                                         vertical: 3,
                                       ),
                                       child: Text(
-                                        data["type"],
+                                        data.type,
                                         style: Theme.of(context)
                                             .textTheme
                                             .titleMedium,
@@ -549,7 +504,7 @@ class _DetailsScreenState extends State<DetailsScreen>
                             ),
                           );
                         },
-                        itemCount: fetchedData!["recommendations"].length,
+                        itemCount: fetchedAnime!.recommendations.length,
                       ),
                     ),
                   ],

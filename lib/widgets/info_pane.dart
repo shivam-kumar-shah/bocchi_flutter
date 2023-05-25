@@ -1,33 +1,24 @@
+import 'package:anime_api/models/anime.dart';
 import 'package:anime_api/providers/user_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class InfoPane extends StatelessWidget {
-  final Map<String, dynamic> title;
-  final int releaseDate;
-  final List<dynamic> genres;
-  final String? season;
-  final String episodes;
-  final String status;
+  final Anime anime;
   const InfoPane({
     super.key,
-    required this.title,
-    required this.releaseDate,
-    required this.genres,
-    this.season,
-    required this.episodes,
-    required this.status,
+    required this.anime,
   });
 
   @override
   Widget build(BuildContext context) {
-    final prefferedTitle = Provider.of<Watchlist>(context).prefferedTitle;
-    PrefferedTitle subtitle;
-    if (prefferedTitle == PrefferedTitle.english) {
-      subtitle = PrefferedTitle.romaji;
-    } else {
-      subtitle = PrefferedTitle.english;
-    }
+    // final prefferedTitle = Provider.of<Watchlist>(context).prefferedTitle;
+    // PrefferedTitle subtitle;
+    // if (prefferedTitle == PrefferedTitle.english) {
+    //   subtitle = PrefferedTitle.romaji;
+    // } else {
+    //   subtitle = PrefferedTitle.english;
+    // }
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -35,7 +26,7 @@ class InfoPane extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          title[prefferedTitle.name] ?? title[subtitle.name] ?? "Unknown",
+          anime.title.jpTitle,
           maxLines: 2,
           textAlign: TextAlign.center,
           overflow: TextOverflow.ellipsis,
@@ -45,7 +36,7 @@ class InfoPane extends StatelessWidget {
           height: 10,
         ),
         Text(
-          genres.join(" | "),
+          anime.genres.join(" | "),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -56,7 +47,7 @@ class InfoPane extends StatelessWidget {
           height: 10,
         ),
         Text(
-          "${season ?? ''} | ${releaseDate != 0 ? releaseDate.toString() : ''}",
+          "${anime.season ?? ''} | ${anime.year != 0 ? anime.year.toString() : ''}",
           style: Theme.of(context).textTheme.displayLarge,
         ),
         const SizedBox(
@@ -69,17 +60,17 @@ class InfoPane extends StatelessWidget {
           children: [
             Expanded(
               child: InfoTile(
-                field: releaseDate != 0 ? releaseDate.toString() : '',
+                field: anime.year != 0 ? anime.year.toString() : '',
                 fieldTitle: "Year",
               ),
             ),
             InfoTile(
-              field: episodes,
+              field: anime.episodes.toString(),
               fieldTitle: "Episodes",
             ),
             Expanded(
               child: InfoTile(
-                field: status,
+                field: anime.status,
                 fieldTitle: "Status",
               ),
             ),

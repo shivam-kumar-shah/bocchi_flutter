@@ -28,7 +28,7 @@ class APIRepo {
     }
   }
 
-  static Future<Anime> getInfo({required int malID}) async {
+  static Future<Anime> getInfo({required String malID}) async {
     try {
       final url = Uri.https(Constants.API_URL, "info/$malID");
       final response = await get(url);
@@ -57,14 +57,14 @@ class APIRepo {
   }
 
   static Future<List<Episode>> getEpisodeList({
-    required String title,
+    required AnimeTitle title,
     required int releasedYear,
     String? season,
     required int page,
   }) async {
     try {
       final animeId = await AnimeScrapper.getAnimepaheId(
-        query: title,
+        query: title.jpTitle,
         releasedYear: releasedYear.toString(),
         season: season ?? "unknown",
       );
@@ -76,6 +76,31 @@ class APIRepo {
     } catch (err) {
       rethrow;
     }
+  }
+
+  static Future<List<Episode>> getAllEpisodes({
+    required AnimeTitle title,
+    required int releasedYear,
+    String? season,
+  }) async {
+    int currentPage = 1;
+    List<Episode> episodeList = [];
+    var tempList = await APIRepo.getEpisodeList(
+      title: title,
+      releasedYear: releasedYear,
+      page: currentPage,
+    );
+    episodeList.addAll(tempList);
+    while (tempList.isNotEmpty) {
+      currentPage++;
+      tempList = await APIRepo.getEpisodeList(
+        title: title,
+        releasedYear: releasedYear,
+        page: currentPage,
+      );
+      episodeList.addAll(tempList);
+    }
+    return episodeList;
   }
 
   static Future<List<Anime>> getLanding({required GetLanding landing}) async {

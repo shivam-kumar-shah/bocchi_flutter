@@ -3,26 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
+import '../models/episode.dart';
+
 class CustomTile extends StatelessWidget {
-  final String image;
-  final String? airDate;
-  final String episodeNumber;
-  final String? title;
-  final String? description;
-  final String? duration;
+  final Episode episode;
+
   const CustomTile({
     super.key,
-    required this.image,
-    this.airDate,
-    required this.episodeNumber,
-    this.title,
-    this.description,
-    this.duration,
+    required this.episode,
   });
 
   @override
   Widget build(BuildContext context) {
-    final date = DateTime.parse(airDate ?? '');
+    final date = DateTime.parse(episode.createdAt ?? '');
     return Flex(
       key: key,
       direction: Axis.horizontal,
@@ -34,7 +27,7 @@ class CustomTile extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(5),
               child: CachedNetworkImage(
-                imageUrl: image,
+                imageUrl: episode.image,
                 fit: BoxFit.cover,
               ),
             ),
@@ -48,17 +41,11 @@ class CustomTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Episode $episodeNumber",
+                  "Episode ${episode.episode}",
                   style: Theme.of(context).textTheme.displayLarge?.copyWith(
                         fontSize: 13,
                         color: Theme.of(context).colorScheme.primary,
                       ),
-                ),
-                Text(
-                  description ?? "",
-                  maxLines: 2,
-                  style: Theme.of(context).textTheme.titleMedium,
-                  overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   DateFormat.yMMMd("en_US").format(date),

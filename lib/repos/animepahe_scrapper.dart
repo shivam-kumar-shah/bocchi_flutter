@@ -44,7 +44,7 @@ class AnimeScrapper {
             return element["year"].toString() == releasedYear;
           }
           return element["year"].toString() == releasedYear &&
-              element["season"].toString() == season;
+              element["season"].toString() == season.toLowerCase().trim();
         },
         orElse: () => searchList[0],
       );
@@ -72,7 +72,9 @@ class AnimeScrapper {
       "page": page.toString(),
     });
     final response = await get(url);
-    final List<Map<String, dynamic>> data = json.decode(response.body)["data"];
+    final List<Map<String, dynamic>> data =
+        json.decode(response.body)["data"] ?? [];
+    if (data.isEmpty) return [];
     return data.map((dataMap) => Episode.fromJSON(dataMap: dataMap)).toList();
   }
 

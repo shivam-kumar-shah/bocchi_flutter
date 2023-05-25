@@ -1,25 +1,18 @@
 import 'package:provider/provider.dart';
 
+import '../models/anime.dart';
 import '../providers/user_preferences.dart';
 import '../screens/details_screen.dart';
 import '../widgets/hero_image.dart';
 import 'package:flutter/material.dart';
 
 class RowItem extends StatelessWidget {
-  final Map<String, dynamic> title;
-  final String image;
-  final String id;
-  final String tag;
-  final bool disabled;
-  final VoidCallback? callback;
+  final Anime anime;
+  final VoidCallback callback;
   const RowItem({
     super.key,
-    required this.title,
-    required this.tag,
-    required this.image,
-    required this.id,
-    this.disabled = false,
-    this.callback,
+    required this.anime,
+    required this.callback,
   });
 
   @override
@@ -37,7 +30,7 @@ class RowItem extends StatelessWidget {
         child: GridTile(
           footer: GridTileBar(
             title: Text(
-              title[prefferedTitle.name] ?? title[subtitle.name],
+              anime.title.jpTitle,
               maxLines: 2,
               softWrap: true,
               style: Theme.of(context).textTheme.displayLarge?.copyWith(
@@ -52,8 +45,8 @@ class RowItem extends StatelessWidget {
             children: [
               Positioned.fill(
                 child: HeroImage(
-                  imageUrl: image,
-                  tag: tag,
+                  imageUrl: anime.coverImg,
+                  tag: anime.id,
                 ),
               ),
               Positioned.fill(
@@ -62,15 +55,10 @@ class RowItem extends StatelessWidget {
                   child: InkWell(
                     borderRadius: BorderRadius.circular(5),
                     onTap: () {
-                      if (callback != null) callback!();
-                      if (disabled) return;
-                      Navigator.of(context).pushNamed(
-                        DetailsScreen.routeName,
-                        arguments: {
-                          "id": id,
-                          "image": image,
-                          "tag": tag,
-                        },
+                      if (anime.episodes != 0) return;
+                      callback();
+                      MaterialPageRoute(
+                        builder: (context) => DetailsScreen(anime: anime),
                       );
                     },
                   ),

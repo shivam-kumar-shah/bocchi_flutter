@@ -23,6 +23,7 @@ class Anime {
   final String posterImg;
   final String coverImg;
   final String status;
+  final String? season;
   final int year;
   final int rating;
   final int episodes;
@@ -34,6 +35,7 @@ class Anime {
   final List<Anime> recommendations;
 
   const Anime({
+    required this.season,
     required this.title,
     required this.id,
     required this.posterImg,
@@ -54,6 +56,7 @@ class Anime {
     required Map<String, dynamic> dataMap,
   }) {
     return Anime(
+      season: dataMap["season"],
       title: AnimeTitle.fromJSON(dataMap: dataMap["title"]),
       id: dataMap["id"],
       posterImg: dataMap["image"] ?? Constants.NOT_FOUND_IMAGE,
