@@ -1,17 +1,16 @@
 import 'package:anime_api/helpers/db_helper.dart';
+import 'package:anime_api/models/anime.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum PrefferedTitle {
-  english,
-  romaji,
-}
+import '../models/anime_history.dart';
+import '../models/enums.dart';
 
 class Watchlist with ChangeNotifier {
-  List<Map<String, dynamic>> watchlist = [];
-  List<Map<String, dynamic>> history = [];
+  List<Anime> watchlist = [];
+  List<AnimeHistory> history = [];
   String preferredQuality = "720";
-  PrefferedTitle prefferedTitle = PrefferedTitle.english;
+  PrefferedTitle prefferedTitle = PrefferedTitle.engTitle;
 
   Future<void> setQuality({required String quality}) async {
     final preferences = await SharedPreferences.getInstance();
@@ -65,11 +64,7 @@ class Watchlist with ChangeNotifier {
 
   Future<List<String>> fetchSearchHistory() async {
     final result = await DBHelper.queryAllSearchHistory();
-    return result
-        .map(
-          (item) => item.values.toList()[0].toString(),
-        )
-        .toList();
+    return result;
   }
 
   Future<void> fetchAll() async {
@@ -80,40 +75,30 @@ class Watchlist with ChangeNotifier {
     return;
   }
 
-  List<Map<String, dynamic>> get getWatchlist {
+  List<Anime> get getWatchlist {
     return [...watchlist];
   }
 
-  List<Map<String, dynamic>> get getHistory {
+  List<AnimeHistory> get getHistory {
     return [...history];
   }
 
   Future<void> addToWatchlist({
-    required String id,
-    required String image,
-    required String title,
+    required Anime anime,
   }) async {
-    await DBHelper.insert(
-      itemId: id,
-      title: title,
-      image: image,
-    );
+    await DBHelper.insert(anime: anime);
     await fetchWatchlist();
     return;
   }
 
   Future<void> addToHistory({
-    required String itemId,
-    required String image,
+    required Anime anime,
     required int episode,
-    required String title,
     required int position,
   }) async {
     await DBHelper.insertHistory(
-      itemId: itemId,
-      image: image,
+      anime: anime,
       episode: episode,
-      title: title,
       position: position,
     );
     await fetchHistory();
@@ -136,23 +121,17 @@ class Watchlist with ChangeNotifier {
   }
 
   Future<void> toggle({
-    required String id,
-    required String image,
-    required String title,
+    required Anime anime,
   }) async {
     bool isPresent = watchlist.indexWhere(
-          (element) => element["id"] == id,
+          (element) => element.id == anime.id,
         ) !=
         -1;
     if (isPresent) {
-      await removeFromWatchlist(id: id);
+      await removeFromWatchlist(id: anime.id);
       return;
     }
-    await addToWatchlist(
-      id: id,
-      image: image,
-      title: title,
-    );
+    await addToWatchlist(anime: anime);
     return;
   }
 }

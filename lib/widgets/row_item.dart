@@ -1,6 +1,7 @@
 import 'package:provider/provider.dart';
 
 import '../models/anime.dart';
+import '../models/enums.dart';
 import '../providers/user_preferences.dart';
 import '../screens/details_screen.dart';
 import '../widgets/hero_image.dart';
@@ -18,12 +19,8 @@ class RowItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final prefferedTitle = Provider.of<Watchlist>(context).prefferedTitle;
-    PrefferedTitle subtitle;
-    if (prefferedTitle == PrefferedTitle.english) {
-      subtitle = PrefferedTitle.romaji;
-    } else {
-      subtitle = PrefferedTitle.english;
-    }
+    if (prefferedTitle == PrefferedTitle.engTitle) {
+    } else {}
     return Card(
       child: ClipRRect(
         borderRadius: BorderRadius.circular(5),

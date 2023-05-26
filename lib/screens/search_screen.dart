@@ -1,11 +1,12 @@
 import 'package:anime_api/providers/user_preferences.dart';
+import 'package:anime_api/repos/api_repo.dart';
 import 'package:anime_api/widgets/bocchi_rich_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 
+import '../models/anime.dart';
 import '../util/app_colors.dart';
-import '../helpers/http_helper.dart';
 import '../widgets/preferences_modal.dart';
 import '../widgets/search_card.dart';
 
@@ -18,31 +19,30 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  bool isLoading = false;
-  int page = 0;
+  List<Anime>? animeList;
   TextEditingController? _controller;
-  final FocusNode _focusNode = FocusNode();
-  Map<String, dynamic>? fetchedData;
+
+  bool isLoading = false;
   bool hasError = false;
-  String? errorMessage;
+  final FocusNode _focusNode = FocusNode();
 
   void fetchData(String query) async {
     try {
       setState(() {
-        hasError = false;
         isLoading = true;
+        hasError = false;
       });
-      final response = await HttpHelper.searchApi(
-        query: _controller!.text,
+      final response = await APIRepo.searchAPI(
+        title: _controller?.value.text ?? "",
       );
       setState(() {
         isLoading = false;
-        fetchedData = response;
+        animeList = response;
       });
     } catch (err) {
       setState(() {
         hasError = true;
-        errorMessage = err.toString();
+        isLoading = false;
       });
     }
   }
@@ -51,11 +51,6 @@ class _SearchScreenState extends State<SearchScreen> {
   void initState() {
     _controller = TextEditingController();
     super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
   }
 
   @override
@@ -95,7 +90,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Text(
-                            errorMessage!,
+                            "Something went wrong\nTry Again",
                             style: Theme.of(context).textTheme.displayLarge,
                             textAlign: TextAlign.center,
                           ),
@@ -121,7 +116,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           ),
                         ),
                       )
-                    : fetchedData == null
+                    : animeList == null
                         ? FutureBuilder(
                             builder: (context, snapshot) {
                               if (!snapshot.hasData) {
@@ -171,7 +166,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         : Flexible(
                             child: CustomScrollView(
                               slivers: [
-                                if (fetchedData!["results"].length == 0)
+                                if (animeList!.isEmpty)
                                   SliverToBoxAdapter(
                                     child: SizedBox(
                                       height:
@@ -179,7 +174,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                               0.8,
                                       child: Center(
                                         child: Text(
-                                          "Sorry, nothing found!",
+                                          "Sorry\nNothing found!",
                                           style: Theme.of(context)
                                               .textTheme
                                               .displayLarge,
@@ -195,21 +190,14 @@ class _SearchScreenState extends State<SearchScreen> {
                                   ),
                                   delegate: SliverChildBuilderDelegate(
                                     (context, index) {
-                                      final data =
-                                          fetchedData!["results"][index];
+                                      final anime = animeList![index];
                                       return SearchCard(
                                         callback: () =>
                                             FocusScope.of(context).unfocus(),
-                                        title: data["title"],
-                                        type: data["type"],
-                                        image: data["image"],
-                                        id: data["id"],
-                                        disabled:
-                                            data["status"] == "Not yet aired" ||
-                                                data["malId"] == null,
+                                        anime: anime,
                                       );
                                     },
-                                    childCount: fetchedData!["results"].length,
+                                    childCount: animeList?.length ?? 0,
                                   ),
                                 ),
                               ],

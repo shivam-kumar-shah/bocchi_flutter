@@ -12,13 +12,7 @@ class InfoPane extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final prefferedTitle = Provider.of<Watchlist>(context).prefferedTitle;
-    // PrefferedTitle subtitle;
-    // if (prefferedTitle == PrefferedTitle.english) {
-    //   subtitle = PrefferedTitle.romaji;
-    // } else {
-    //   subtitle = PrefferedTitle.english;
-    // }
+    final prefference = Provider.of<Watchlist>(context).prefferedTitle;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -26,7 +20,7 @@ class InfoPane extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          anime.title.jpTitle,
+          anime.title.prefTitle(prefference),
           maxLines: 2,
           textAlign: TextAlign.center,
           overflow: TextOverflow.ellipsis,

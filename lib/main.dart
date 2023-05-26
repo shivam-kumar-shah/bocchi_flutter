@@ -10,7 +10,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 
-import './screens/details_screen.dart';
 import './screens/home_screen.dart';
 import 'util/app_colors.dart';
 
@@ -93,9 +92,6 @@ class _MyAppState extends State<MyApp> {
                   ),
                   themeMode: ThemeMode.dark,
                   home: const Home(),
-                  routes: {
-                    DetailsScreen.routeName: (context) => const DetailsScreen(),
-                  },
                 );
               },
             ));

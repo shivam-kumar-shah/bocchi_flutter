@@ -1,9 +1,10 @@
+import 'package:anime_api/repos/api_repo.dart';
 import 'package:anime_api/util/app_colors.dart';
 
+import '../models/anime.dart';
+import '../models/enums.dart';
 import '../widgets/row_item.dart';
 import 'package:flutter/material.dart';
-
-import '../helpers/http_helper.dart';
 
 class RowSliver extends StatefulWidget {
   final GetLanding option;
@@ -15,7 +16,7 @@ class RowSliver extends StatefulWidget {
 }
 
 class _RowSliverState extends State<RowSliver> {
-  List<dynamic>? fetchedData;
+  List<Anime>? fetchedData;
   bool hasError = false;
   String? errorMessage;
 
@@ -25,9 +26,9 @@ class _RowSliverState extends State<RowSliver> {
         hasError = false;
       });
       await Future.delayed(const Duration(milliseconds: 500));
-      final result = await HttpHelper.getLanding(landing: widget.option);
+      final result = await APIRepo.getLanding(landing: widget.option);
       setState(() {
-        fetchedData = result["results"];
+        fetchedData = result;
       });
     } catch (err) {
       setState(() {
@@ -90,12 +91,8 @@ class _RowSliverState extends State<RowSliver> {
                   mainAxisExtent: 280,
                 ),
                 itemBuilder: (context, index) => RowItem(
-                  id: fetchedData![index]["id"],
-                  image: fetchedData![index]["image"],
-                  title: fetchedData![index]["title"],
-                  tag: widget.option.name +
-                      fetchedData![index]["id"].toString() +
-                      fetchedData![index]["episodeId"].toString(),
+                  anime: fetchedData![index],
+                  callback: () {},
                 ),
                 itemCount: fetchedData!.length,
               );

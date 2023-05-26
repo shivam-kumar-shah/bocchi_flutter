@@ -1,3 +1,4 @@
+import 'package:anime_api/models/enums.dart';
 import 'package:anime_api/util/constants.dart';
 
 class AnimeTitle {
@@ -14,6 +15,15 @@ class AnimeTitle {
       jpTitle: dataMap["romaji"] ?? dataMap["romaji"] ?? "Unknown",
       engTitle: dataMap["english"] ?? dataMap["romaji"] ?? "Unknown",
     );
+  }
+
+  String prefTitle(PrefferedTitle prefference) {
+    switch (prefference) {
+      case PrefferedTitle.engTitle:
+        return engTitle;
+      default:
+        return jpTitle;
+    }
   }
 }
 
@@ -82,5 +92,29 @@ class Anime {
               .toList()
           : [],
     );
+  }
+
+  Map<String, dynamic> get toJSON {
+    final jsonValue = {
+      "id": id,
+      "data": {
+        "id": id,
+        "releaseDate": year,
+        "genres": genres,
+        "type": type,
+        "description": description,
+        "relationType": relationType,
+        "relations": [],
+        "recommendations": [],
+        "status": status,
+        "rating": rating,
+        "totalEpisodes": episodes,
+        "cover": coverImg,
+        "image": posterImg,
+        "title": title,
+        "season": season,
+      }
+    };
+    return jsonValue;
   }
 }

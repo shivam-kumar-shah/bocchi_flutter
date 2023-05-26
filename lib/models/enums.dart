@@ -3,3 +3,8 @@ enum GetLanding {
   popular,
   trending,
 }
+
+enum PrefferedTitle {
+  engTitle,
+  jpTitle,
+}

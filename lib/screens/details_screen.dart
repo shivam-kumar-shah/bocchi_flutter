@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:anime_api/models/anime.dart';
 import 'package:anime_api/models/episode.dart';
 import 'package:anime_api/repos/api_repo.dart';
@@ -10,7 +8,6 @@ import 'package:provider/provider.dart';
 
 import '../util/app_colors.dart';
 import '../helpers/custom_route.dart';
-import '../helpers/http_helper.dart';
 import '../screens/video_player_screen.dart';
 import '../providers/user_preferences.dart';
 import '../widgets/row_item.dart';
@@ -112,24 +109,20 @@ class _DetailsScreenState extends State<DetailsScreen>
     int index = -1;
     bool isPresent = false;
     final anime = widget.anime;
-    // if (fetchedData != null) {
-    //   index = history.indexWhere((item) => item["id"] == fetchedData!["id"]);
-    //   isPresent = !(Provider.of<Watchlist>(context).getWatchlist.indexWhere(
-    //             (element) => element["id"] == fetchedData!["id"],
-    //           ) ==
-    //       -1);
-    // }
+    if (fetchedAnime != null) {
+      index = history.indexWhere((item) => item.anime.id == fetchedAnime!.id);
+      isPresent = !(Provider.of<Watchlist>(context).getWatchlist.indexWhere(
+                (element) => element.id == fetchedAnime!.id,
+              ) ==
+          -1);
+    }
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await Provider.of<Watchlist>(
             context,
             listen: false,
-          ).toggle(
-            id: anime.id,
-            title: anime.title.jpTitle,
-            image: anime.coverImg,
-          );
+          ).toggle(anime: anime);
         },
         tooltip: "Add to watchlist",
         child: isPresent
@@ -241,10 +234,10 @@ class _DetailsScreenState extends State<DetailsScreen>
                                           anime: fetchedAnime!,
                                           episodeList: episodeList!,
                                           episode: index != -1
-                                              ? history[index]["episode"]
+                                              ? history[index].episode
                                               : data.episode,
                                           position: index != -1
-                                              ? history[index]["position"]
+                                              ? history[index].position
                                               : 0,
                                         );
                                       },
@@ -253,7 +246,7 @@ class _DetailsScreenState extends State<DetailsScreen>
                                 },
                           child: Text(
                             index != -1
-                                ? "Continue Watching \u2022 E${history[index]["episode"]}"
+                                ? "Continue Watching \u2022 E${history[index].episode}"
                                 : "Start Watching",
                           ),
                         ),
@@ -321,9 +314,9 @@ class _DetailsScreenState extends State<DetailsScreen>
                                   });
                                 },
                                 icon: isDescending
-                                    ? Icon(Icons.arrow_upward_rounded)
-                                    : Icon(Icons.arrow_downward_rounded),
-                                label: Text("Sort"),
+                                    ? const Icon(Icons.arrow_upward_rounded)
+                                    : const Icon(Icons.arrow_downward_rounded),
+                                label: const Text("Sort"),
                               ),
                             ],
                           ),

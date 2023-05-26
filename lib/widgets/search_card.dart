@@ -1,21 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../models/anime.dart';
 import 'row_item.dart';
 
 class SearchCard extends StatelessWidget {
   final VoidCallback callback;
-  final String image;
-  final String id;
-  final Map<String, dynamic> title;
-  final bool disabled;
-  final String type;
+  final Anime anime;
   const SearchCard({
     super.key,
-    required this.image,
-    required this.id,
-    required this.title,
-    required this.disabled,
-    required this.type,
+    required this.anime,
     required this.callback,
   });
 
@@ -25,11 +18,7 @@ class SearchCard extends StatelessWidget {
       child: Stack(
         children: [
           RowItem(
-            id: id,
-            image: image,
-            tag: id,
-            title: title,
-            disabled: disabled,
+            anime: anime,
             callback: callback,
           ),
           Positioned(
@@ -48,7 +37,7 @@ class SearchCard extends StatelessWidget {
                   vertical: 3,
                 ),
                 child: Text(
-                  type,
+                  anime.type,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),

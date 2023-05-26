@@ -1,10 +1,8 @@
-import 'dart:convert';
 import 'dart:math';
 
 import 'package:anime_api/models/anime.dart';
 import 'package:anime_api/repos/api_repo.dart';
 import 'package:anime_api/util/app_colors.dart';
-import 'package:anime_api/helpers/http_helper.dart';
 import 'package:anime_api/providers/user_preferences.dart';
 import 'package:anime_api/screens/details_screen.dart';
 import 'package:anime_api/widgets/custom_player.dart';
@@ -14,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 
+import '../models/enums.dart';
 import '../models/episode.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
@@ -50,9 +49,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       listen: false,
     ).addToHistory(
       episode: episode,
-      image: widget.image,
-      itemId: widget.id,
-      title: json.encode(widget.title),
+      anime: widget.anime,
       position: position,
     );
     setState(() {
@@ -67,9 +64,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     }
     try {
       final response = await APIRepo.getVideoSources(
-        episodeID: widget.episodeList.firstWhere(
-            (element) => element["episode"] == currentEpisode)["session"],
-        animeID: widget.animeId,
+        episodeID: widget.episodeList
+            .firstWhere((element) => element.episode == currentEpisode)
+            .id,
+        animeID: widget.anime.id,
       );
       setState(() {
         videoSources = response;
@@ -86,8 +84,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     int episode = 1,
     Duration duration = Duration.zero,
   }) {
-    double position =
-        100 * ((episode - widget.episodeList[0]["episode"]) * 1.0);
+    double position = 100 * ((episode - widget.episodeList[0].episode) * 1.0);
     if (episode * 60 > 3000) {
       _controller.jumpTo(min(position, _controller.position.maxScrollExtent));
     }
@@ -109,9 +106,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       listen: false,
     ).addToHistory(
       episode: episode,
-      image: widget.image,
-      itemId: widget.id,
-      title: json.encode(widget.title),
+      anime: widget.anime,
       position: position ?? 0,
     );
   }
@@ -141,12 +136,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     int currentLength = widget.episodeList.length;
     final prefferedTitle =
         Provider.of<Watchlist>(context, listen: false).prefferedTitle;
-    PrefferedTitle subtitle;
-    if (prefferedTitle == PrefferedTitle.english) {
-      subtitle = PrefferedTitle.romaji;
-    } else {
-      subtitle = PrefferedTitle.english;
-    }
+    if (prefferedTitle == PrefferedTitle.engTitle) {
+    } else {}
     return Scaffold(
       body: SafeArea(
         child: Flex(
@@ -198,21 +189,15 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          Navigator.of(context).pushNamedAndRemoveUntil(
-                            DetailsScreen.routeName,
-                            (route) {
-                              return route.isFirst;
-                            },
-                            arguments: {
-                              "id": widget.id,
-                              "image": widget.image,
-                              "tag": widget.id,
-                            },
+                          MaterialPageRoute(
+                            builder: (context) => DetailsScreen(
+                              anime: widget.anime,
+                            ),
                           );
                         },
                         child: HeroImage(
-                          imageUrl: widget.image,
-                          tag: widget.id,
+                          imageUrl: widget.anime.posterImg,
+                          tag: widget.anime.id,
                         ),
                       ),
                       const SizedBox(
@@ -233,9 +218,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                               height: 3,
                             ),
                             Text(
-                              // widget.title[prefferedTitle.name] ??
-                              //     widget.title[subtitle.name],
-                              widget.title.jpTitle,
+                              widget.anime.title.prefTitle(prefferedTitle),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: Theme.of(context)
@@ -284,30 +267,25 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
               child: ListView.builder(
                 controller: _controller,
                 itemBuilder: (context, index) {
-                  final data = widget.episodeList[index];
+                  final episode = widget.episodeList[index];
 
                   return InkWell(
                     onTap: () {
-                      if (data["episode"] == currentEpisode) return;
+                      if (episode.episode == currentEpisode) return;
                       getEpisode(
-                        episode: data["episode"],
+                        episode: episode.episode,
                         position: 0,
                       );
                     },
                     child: Container(
-                      color: data["episode"] == currentEpisode
+                      color: episode.episode == currentEpisode
                           ? AppColors.grey
                           : null,
                       width: MediaQuery.of(context).size.width,
                       height: 100,
                       child: CustomTile(
-                        duration: data["duration"],
-                        image: data["snapshot"],
-                        episodeNumber: data["episode"].toString(),
-                        airDate: data["created_at"],
-                        description: data["disc"],
-                        key: ValueKey(data["episode"]),
-                        title: data["title"],
+                        episode: episode,
+                        key: ValueKey(episode.id),
                       ),
                     ),
                   );

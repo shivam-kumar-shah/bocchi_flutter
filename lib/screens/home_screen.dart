@@ -1,9 +1,9 @@
 import 'package:anime_api/widgets/preferences_modal.dart';
 
+import '../models/enums.dart';
 import '../widgets/bocchi_rich_text.dart';
 import 'package:flutter/material.dart';
 
-import '../helpers/http_helper.dart';
 import '../widgets/row_sliver.dart';
 
 class HomeScreen extends StatelessWidget {

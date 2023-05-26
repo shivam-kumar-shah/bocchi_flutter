@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:anime_api/widgets/bocchi_rich_text.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -62,15 +60,13 @@ class LibraryScreen extends StatelessWidget {
                   child: ListView.builder(
                     itemExtent: 170,
                     itemBuilder: (context, index) {
-                      final data = Provider.of<Watchlist>(context)
+                      final animeHistory = Provider.of<Watchlist>(context)
                           .getHistory
                           .reversed
                           .toList()[index];
                       return RowItem(
-                        title: json.decode(data["title"]),
-                        tag: data["id"],
-                        image: data["image"],
-                        id: data["id"],
+                        anime: animeHistory.anime,
+                        callback: () {},
                       );
                     },
                     itemCount:
@@ -109,14 +105,12 @@ class LibraryScreen extends StatelessWidget {
                   height: 250,
                   child: ListView.builder(
                     itemBuilder: (context, index) {
-                      final data = Provider.of<Watchlist>(
+                      final anime = Provider.of<Watchlist>(
                         context,
                       ).getWatchlist[index];
                       return RowItem(
-                        id: data["id"],
-                        image: data["image"],
-                        title: json.decode(data["title"]),
-                        tag: "watchlist${data["id"]}",
+                        anime: anime,
+                        callback: () {},
                       );
                     },
                     itemCount:

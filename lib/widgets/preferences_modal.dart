@@ -2,6 +2,8 @@ import 'package:anime_api/providers/user_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../models/enums.dart';
+
 class PreferencesModal extends StatelessWidget {
   const PreferencesModal({super.key});
 
@@ -79,7 +81,7 @@ class PreferencesModal extends StatelessWidget {
                   _buildButton(
                     "English",
                     () {
-                      value.setTitle(title: PrefferedTitle.english);
+                      value.setTitle(title: PrefferedTitle.engTitle);
                     },
                     prefferedTitle == "english",
                     context,
@@ -90,7 +92,7 @@ class PreferencesModal extends StatelessWidget {
                   _buildButton(
                     "Romaji",
                     () {
-                      value.setTitle(title: PrefferedTitle.romaji);
+                      value.setTitle(title: PrefferedTitle.jpTitle);
                     },
                     prefferedTitle == "romaji",
                     context,
