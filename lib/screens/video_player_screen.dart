@@ -6,7 +6,6 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 
 import '../models/anime.dart';
-import '../models/enums.dart';
 import '../models/episode.dart';
 import '../models/source.dart';
 import '../providers/user_preferences.dart';
