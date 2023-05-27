@@ -1,12 +1,12 @@
-import 'package:chewie/chewie.dart';
+import 'dart:async';
+
+import 'package:anime_api/util/app_colors.dart';
 import "package:flutter/material.dart";
-import 'package:flutter/services.dart';
+import 'package:flutter_meedu_videoplayer/meedu_player.dart';
 import 'package:provider/provider.dart';
-import 'package:video_player/video_player.dart';
 
 import '../models/source.dart';
 import '../providers/user_preferences.dart';
-import 'custom_controls.dart';
 
 class CustomPlayer extends StatefulWidget {
   final List<Source> streams;
@@ -32,8 +32,8 @@ class _CustomPlayerState extends State<CustomPlayer> {
   bool hasLoaded = false;
   bool hasError = false;
 
-  VideoPlayerController? _videoPlayerController;
-  ChewieController? _controller;
+  MeeduPlayerController? _meeduPlayerController;
+  StreamSubscription? _playerSubscription;
 
   @override
   void initState() {
@@ -41,119 +41,49 @@ class _CustomPlayerState extends State<CustomPlayer> {
       context,
       listen: false,
     ).preferredQuality;
+
     currentSource = widget.streams.firstWhere(
       (element) => element.resolution == resolution,
       orElse: () => widget.streams.last,
     );
-    initPlayer(
-      position: Duration(
-        seconds: widget.initialPosition,
-      ),
-    );
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _videoPlayerController?.dispose();
-    _controller?.dispose();
-    super.dispose();
-  }
-
-  Future<void> toggleSource({required Source newSource}) async {
-    if (newSource.url == currentSource.url) return;
-    _controller?.exitFullScreen();
-    _controller?.videoPlayerController.pause();
-    final position = await _controller?.videoPlayerController.position;
-    setState(() {
-      currentSource = newSource;
-      hasLoaded = false;
-    });
-    await initPlayer(position: position!);
-    return;
-  }
-
-  Future<void> initPlayer({
-    required Duration position,
-  }) async {
-    final streams = widget.streams;
-    final url = Uri.parse(currentSource.url);
-
-    _videoPlayerController = VideoPlayerController.contentUri(url);
-
-    try {
-      await _videoPlayerController!.initialize();
-    } catch (error) {
-      setState(() {
-        hasError = true;
-      });
-    }
-
-    _controller = customChewieController(
-      streams: streams,
-      position: position,
-    );
-
+    initController();
+    initPlayer(position: Duration(seconds: widget.initialPosition));
     setState(() {
       hasLoaded = true;
     });
+
+    super.initState();
   }
 
-  ChewieController customChewieController({
-    Duration position = Duration.zero,
-    required List<dynamic> streams,
-  }) {
-    return ChewieController(
-      allowedScreenSleep: false,
-      videoPlayerController: _videoPlayerController!,
-      showControlsOnInitialize: true,
-      autoPlay: true,
-      deviceOrientationsAfterFullScreen: [
-        DeviceOrientation.portraitUp,
-        DeviceOrientation.portraitDown,
-      ],
-      deviceOrientationsOnEnterFullScreen: [
-        DeviceOrientation.landscapeLeft,
-        DeviceOrientation.landscapeRight,
-      ],
-      customControls: CustomControls(
-        callback: widget.nextEpisode,
-        isLast: widget.isLast,
-      ),
-      startAt: position,
-      maxScale: 2,
-      aspectRatio: 16 / 9,
-      materialProgressColors: ChewieProgressColors(
-        backgroundColor: Colors.grey[900] as Color,
-        bufferedColor: Colors.grey[300] as Color,
-        handleColor: Theme.of(context).colorScheme.primary,
-        playedColor: Theme.of(context).colorScheme.primary,
-      ),
-      additionalOptions: (context) => [
-        OptionItem(
-          onTap: () {
-            Navigator.of(context).pop();
-            showModalBottomSheet(
-              context: context,
-              builder: (context) => SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: widget.streams.map((source) {
-                    return ListTile(
-                      leading: Icon(
-                        Icons.check_rounded,
-                        color: currentSource.url == source.url
-                            ? Theme.of(context).colorScheme.onBackground
-                            : Colors.transparent,
-                      ),
-                      title: Text(
-                          "${source.fansubGroup} \u2022 ${source.audio} \u2022 ${source.resolution}"),
-                      onTap: () {
-                        toggleSource(newSource: source);
-                        Navigator.of(context).pop();
-                      },
-                      trailing: source.resolution == "1080" ||
-                              source.resolution == "720"
+  void initController() {
+    final streams = widget.streams;
+    _meeduPlayerController = MeeduPlayerController(
+      colorTheme: AppColors.green,
+      controlsStyle: ControlsStyle.primary,
+      enabledButtons: const EnabledButtons(playBackSpeed: false),
+      bottomRight: IconButton(
+        tooltip: "Quality",
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            builder: (context) => ListView.builder(
+              itemBuilder: (context, index) {
+                final source = streams[index];
+                return ListTile(
+                  leading: Icon(
+                    Icons.check_rounded,
+                    color: currentSource.url == source.url
+                        ? Theme.of(context).colorScheme.onBackground
+                        : Colors.transparent,
+                  ),
+                  title: Text(
+                      "${source.fansubGroup} \u2022 ${source.audio} \u2022 ${source.resolution}"),
+                  onTap: () {
+                    toggleSource(newSource: source);
+                    Navigator.of(context).pop();
+                  },
+                  trailing:
+                      source.resolution == "1080" || source.resolution == "720"
                           ? Icon(
                               Icons.hd_outlined,
                               color: Theme.of(
@@ -161,26 +91,62 @@ class _CustomPlayerState extends State<CustomPlayer> {
                               ).colorScheme.onBackground,
                             )
                           : null,
-                    );
-                  }).toList(),
-                ),
-              ),
-            );
-          },
-          iconData: Icons.settings,
-          title: "Quality",
-          subtitle: "${currentSource.resolution}p",
-        ),
-      ],
+                );
+              },
+              itemCount: streams.length,
+              shrinkWrap: true,
+            ),
+          );
+        },
+        icon: const Icon(Icons.settings),
+      ),
     );
+
+    _playerSubscription = _meeduPlayerController!.onPositionChanged.listen(
+      (event) {
+        widget.callback(event);
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _playerSubscription?.cancel();
+    _meeduPlayerController?.dispose();
+    super.dispose();
+  }
+
+  Future<void> toggleSource({required Source newSource}) async {
+    if (newSource.url == currentSource.url) return;
+    final position = _meeduPlayerController!.position.value;
+    setState(() {
+      currentSource = newSource;
+      hasLoaded = false;
+    });
+    await initPlayer(position: position);
+    return;
+  }
+
+  Future<void> initPlayer({
+    required Duration position,
+  }) async {
+    _meeduPlayerController!.setDataSource(
+      DataSource(
+        type: DataSourceType.network,
+        source: currentSource.url,
+      ),
+      autoplay: true,
+      seekTo: position,
+    );
+    setState(() {
+      hasLoaded = true;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        final position = await _controller!.videoPlayerController.position;
-        await widget.callback(position: position?.inSeconds);
         return true;
       },
       child: hasError
@@ -193,7 +159,7 @@ class _CustomPlayerState extends State<CustomPlayer> {
               ),
             )
           : hasLoaded
-              ? Chewie(controller: _controller!)
+              ? MeeduVideoPlayer(controller: _meeduPlayerController!)
               : Container(
                   color: Theme.of(context).colorScheme.surface,
                   child: Center(

@@ -107,17 +107,16 @@ class _DetailsScreenState extends State<DetailsScreen>
 
   @override
   Widget build(BuildContext context) {
-    final history = Provider.of<Watchlist>(context).getHistory;
-    int index = -1;
-    bool isPresent = false;
     final anime = widget.anime;
-    if (fetchedAnime != null) {
-      index = history.indexWhere((item) => item.anime.id == fetchedAnime!.id);
-      isPresent = !(Provider.of<Watchlist>(context).getWatchlist.indexWhere(
-                (element) => element.id == fetchedAnime!.id,
-              ) ==
-          -1);
-    }
+    final history = Provider.of<Watchlist>(context).getHistory;
+    final historyIndex = history.indexWhere(
+      (element) => element.anime.id == anime.id,
+    );
+    bool isPresent = historyIndex != -1;
+    bool isWishlisted = Provider.of<Watchlist>(context)
+            .getWatchlist
+            .indexWhere((element) => element.id == anime.id) !=
+        -1;
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
@@ -127,7 +126,7 @@ class _DetailsScreenState extends State<DetailsScreen>
           ).toggle(anime: anime);
         },
         tooltip: "Add to watchlist",
-        child: isPresent
+        child: isWishlisted
             ? const Icon(
                 Icons.done_rounded,
               )
@@ -235,11 +234,11 @@ class _DetailsScreenState extends State<DetailsScreen>
                                         return VideoPlayerScreen(
                                           anime: fetchedAnime!,
                                           episodeList: episodeList!,
-                                          episode: index != -1
-                                              ? history[index].episode
+                                          episode: isPresent
+                                              ? history[historyIndex].episode
                                               : data.episode,
-                                          position: index != -1
-                                              ? history[index].position
+                                          position: isPresent
+                                              ? history[historyIndex].position
                                               : 0,
                                         );
                                       },
@@ -247,8 +246,8 @@ class _DetailsScreenState extends State<DetailsScreen>
                                   );
                                 },
                           child: Text(
-                            index != -1
-                                ? "Continue Watching \u2022 E${history[index].episode}"
+                            isPresent
+                                ? "Continue Watching \u2022 E${history[historyIndex].episode}"
                                 : "Start Watching",
                           ),
                         ),

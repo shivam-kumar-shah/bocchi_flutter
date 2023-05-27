@@ -100,15 +100,15 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     );
   }
 
-  Future<void> callback({required int? position}) async {
+  void callback(Duration position) {
     int episode = currentEpisode ?? 1;
-    await Provider.of<Watchlist>(
+    Provider.of<Watchlist>(
       context,
       listen: false,
     ).addToHistory(
       episode: episode,
       anime: widget.anime,
-      position: position ?? 0,
+      position: position.inSeconds,
     );
   }
 
@@ -137,8 +137,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     int currentLength = widget.episodeList.length;
     final prefferedTitle =
         Provider.of<Watchlist>(context, listen: false).prefferedTitle;
-    if (prefferedTitle == PrefferedTitle.engTitle) {
-    } else {}
     return Scaffold(
       body: SafeArea(
         child: Flex(
