@@ -85,8 +85,9 @@ class AnimeScrapper {
   static Future<List<Source>> fetchAnimepaheEpisodesSources({
     required String animeID,
     required String episodeID,
+    Uri? fetchedURL,
   }) async {
-    final url = Uri.https(_baseUrl, "/play/$animeID/$episodeID");
+    final url = fetchedURL ?? Uri.https(_baseUrl, "/play/$animeID/$episodeID");
     try {
       final response = await get(url);
       final parsedResponse = html.parse(response.body);
@@ -119,13 +120,13 @@ class AnimeScrapper {
         "url": json.encode(referrerList),
       });
       final kwikUrl = json.decode((await get(apiCall)).body) as List<dynamic>;
+
       int size = sourceList?.length as int;
       for (int i = 0; i < size; i++) {
         sourceList![i] = {
           ...sourceList[i],
           "url": kwikUrl.firstWhere((element) =>
-              element["audio"] == sourceList[i]["audio"] &&
-              element["resolution"] == sourceList[i]["resolution"])["url"],
+              element["referrer"] == sourceList[i]["referrer"])["url"],
           "streamInfo": streamInfoList![i].firstChild?.text ?? "",
         };
       }

@@ -50,7 +50,9 @@ class APIRepo {
         episodeID: episode.id.toString(),
       );
     } catch (err) {
-      print(err);
+      if (kDebugMode) {
+        print(err);
+      }
       rethrow;
     }
   }

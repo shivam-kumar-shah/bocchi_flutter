@@ -14,8 +14,8 @@ class AnimeTitle {
     String? eng;
     String? jp;
     if (dataMap.runtimeType == String) {
-      jp = dataMap.toString().split('-')[0];
-      eng = dataMap.toString().split('-')[1];
+      jp = dataMap.toString().split('\u2022')[0];
+      eng = dataMap.toString().split('\u2022')[1];
     }
     return AnimeTitle(
       jpTitle: jp ?? dataMap["romaji"] ?? dataMap["romaji"] ?? "Unknown",
@@ -24,7 +24,7 @@ class AnimeTitle {
   }
 
   String get toJSON {
-    return "$jpTitle-$engTitle";
+    return "$jpTitle\u2022$engTitle";
   }
 
   String prefTitle(PrefferedTitle prefference) {
@@ -41,6 +41,7 @@ class Anime {
   final AnimeTitle title;
   final String id;
   final String coverImg;
+  final String posterImg;
   final String status;
   final String? season;
   final int year;
@@ -58,6 +59,7 @@ class Anime {
     required this.title,
     required this.id,
     required this.coverImg,
+    required this.posterImg,
     required this.episodes,
     required this.rating,
     required this.status,
@@ -80,7 +82,12 @@ class Anime {
       id: dataMap["id"].toString(),
       coverImg:
           dataMap["image"] ?? dataMap["cover"] ?? Constants.NOT_FOUND_IMAGE,
-      episodes: dataMap["totalEpisodes"] ?? 0,
+      posterImg:
+          dataMap["cover"] ?? dataMap["image"] ?? Constants.NOT_FOUND_IMAGE,
+      episodes: dataMap["totalEpisodes"] ??
+          dataMap["episodeNumber"] ??
+          dataMap["episodes"] ??
+          0,
       rating: dataMap["rating"] ?? -1,
       status: dataMap["status"] ?? "Unknown",
       year: dataMap["releaseDate"] ?? -1,
@@ -89,7 +96,7 @@ class Anime {
               .map((item) => item.toString())
               .toList()
           : dataMap["genreList"] != null
-              ? dataMap["genreList"].toString().split('-')
+              ? dataMap["genreList"].toString().split('\u2022')
               : [],
       type: dataMap["type"] ?? "Unknown",
       description: dataMap["description"] ?? "",
@@ -111,7 +118,7 @@ class Anime {
     final jsonValue = {
       "id": id,
       "releaseDate": year,
-      "genreList": genres.join('-'),
+      "genreList": genres.join('\u2022'),
       "type": type,
       "description": description,
       "relationType": relationType,

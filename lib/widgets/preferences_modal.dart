@@ -23,7 +23,7 @@ class PreferencesModal extends StatelessWidget {
     return Consumer<Watchlist>(
       builder: (context, value, child) {
         final data = value.preferredQuality;
-        final prefferedTitle = value.prefferedTitle.name;
+        final prefferedTitle = value.prefferedTitle;
         return Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: 8,
@@ -83,7 +83,7 @@ class PreferencesModal extends StatelessWidget {
                     () {
                       value.setTitle(title: PrefferedTitle.engTitle);
                     },
-                    prefferedTitle == "english",
+                    prefferedTitle == PrefferedTitle.engTitle,
                     context,
                   ),
                   const SizedBox(
@@ -94,7 +94,7 @@ class PreferencesModal extends StatelessWidget {
                     () {
                       value.setTitle(title: PrefferedTitle.jpTitle);
                     },
-                    prefferedTitle == "romaji",
+                    prefferedTitle == PrefferedTitle.jpTitle,
                     context,
                   ),
                 ],
