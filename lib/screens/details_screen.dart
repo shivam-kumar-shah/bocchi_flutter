@@ -53,7 +53,7 @@ class _DetailsScreenState extends State<DetailsScreen>
       isLoading = true;
     });
     final anime = fetchedAnime!;
-    final episodes = await APIRepo.getAllEpisodes(
+    final episodes = await APIRepository.getAllEpisodes(
       title: anime.title,
       releasedYear: anime.year,
       season: anime.season,
@@ -74,7 +74,7 @@ class _DetailsScreenState extends State<DetailsScreen>
   }
 
   void fetchData() async {
-    final result = await APIRepo.getInfo(
+    final result = await APIRepository.getInfo(
       malID: widget.anime.id,
     );
     try {

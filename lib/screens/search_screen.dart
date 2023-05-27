@@ -32,7 +32,7 @@ class _SearchScreenState extends State<SearchScreen> {
         isLoading = true;
         hasError = false;
       });
-      final response = await APIRepo.searchAPI(
+      final response = await APIRepository.searchAPI(
         title: _controller?.value.text ?? "",
       );
       setState(() {

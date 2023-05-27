@@ -64,7 +64,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       );
     }
     try {
-      final response = await APIRepo.getVideoSources(
+      final response = await APIRepository.getVideoSources(
           episode: widget.episodeList
               .firstWhere((element) => element.episode == currentEpisode));
       setState(() {

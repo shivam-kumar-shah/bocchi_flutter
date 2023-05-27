@@ -10,7 +10,7 @@ import '../models/source.dart';
 import '../util/constants.dart';
 import "animepahe_scrapper.dart";
 
-class APIRepo {
+class APIRepository {
   static Future<List<Anime>> searchAPI({
     required String title,
   }) async {
@@ -86,7 +86,7 @@ class APIRepo {
   }) async {
     int currentPage = 1;
     List<Episode> episodeList = [];
-    var tempList = await APIRepo.getEpisodeList(
+    var tempList = await APIRepository.getEpisodeList(
       title: title,
       releasedYear: releasedYear,
       page: currentPage,
@@ -94,7 +94,7 @@ class APIRepo {
     episodeList.addAll(tempList);
     while (tempList.isNotEmpty) {
       currentPage++;
-      tempList = await APIRepo.getEpisodeList(
+      tempList = await APIRepository.getEpisodeList(
         title: title,
         releasedYear: releasedYear,
         page: currentPage,

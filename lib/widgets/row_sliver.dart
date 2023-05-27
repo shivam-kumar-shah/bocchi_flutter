@@ -25,7 +25,7 @@ class _RowSliverState extends State<RowSliver> {
       setState(() {
         hasError = false;
       });
-      final result = await APIRepo.getLanding(landing: widget.option);
+      final result = await APIRepository.getLanding(landing: widget.option);
       setState(() {
         fetchedData = result;
       });
