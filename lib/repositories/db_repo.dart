@@ -1,8 +1,8 @@
-import 'package:anime_api/models/anime_history.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '../models/anime.dart';
+import '../models/anime_history.dart';
 
 class DBHelper {
   static const tableName = "watchlist";

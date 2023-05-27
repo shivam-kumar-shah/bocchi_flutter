@@ -1,19 +1,19 @@
-import 'package:anime_api/models/anime.dart';
-import 'package:anime_api/models/episode.dart';
-import 'package:anime_api/repos/api_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:html/parser.dart';
 import 'package:provider/provider.dart';
 
-import '../util/app_colors.dart';
 import '../helpers/custom_route.dart';
-import '../screens/video_player_screen.dart';
+import '../models/anime.dart';
+import '../models/episode.dart';
 import '../providers/user_preferences.dart';
-import '../widgets/row_item.dart';
+import '../repositories/api_repo.dart';
+import '../screens/video_player_screen.dart';
+import '../util/app_colors.dart';
 import '../widgets/custom_tile.dart';
 import '../widgets/hero_image.dart';
 import '../widgets/info_pane.dart';
+import '../widgets/row_item.dart';
 
 class DetailsScreen extends StatefulWidget {
   const DetailsScreen({

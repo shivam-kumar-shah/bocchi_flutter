@@ -1,7 +1,8 @@
-import 'package:anime_api/models/anime.dart';
-import 'package:anime_api/providers/user_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../models/anime.dart';
+import '../providers/user_preferences.dart';
 
 class InfoPane extends StatelessWidget {
   final Anime anime;

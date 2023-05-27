@@ -1,11 +1,10 @@
-import 'package:anime_api/repos/api_repo.dart';
-import 'package:anime_api/screens/details_screen.dart';
-import 'package:anime_api/util/app_colors.dart';
+import 'package:flutter/material.dart';
 
 import '../models/anime.dart';
 import '../models/enums.dart';
+import '../repositories/api_repo.dart';
+import '../util/app_colors.dart';
 import '../widgets/row_item.dart';
-import 'package:flutter/material.dart';
 
 class RowSliver extends StatefulWidget {
   final GetLanding option;

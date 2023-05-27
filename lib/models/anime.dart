@@ -1,5 +1,5 @@
-import 'package:anime_api/models/enums.dart';
-import 'package:anime_api/util/constants.dart';
+import 'enums.dart';
+import '../util/constants.dart';
 
 class AnimeTitle {
   final String jpTitle;

@@ -1,10 +1,10 @@
-import 'package:anime_api/helpers/db_helper.dart';
-import 'package:anime_api/models/anime.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/anime.dart';
 import '../models/anime_history.dart';
 import '../models/enums.dart';
+import '../repositories/db_repo.dart';
 
 class Watchlist with ChangeNotifier {
   List<Anime> watchlist = [];

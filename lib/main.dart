@@ -1,16 +1,15 @@
-import 'package:anime_api/screens/library_screen.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 import '../providers/user_preferences.dart';
 import '../screens/search_screen.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:provider/provider.dart';
-
-import './screens/home_screen.dart';
+import 'screens/home_screen.dart';
+import 'screens/library_screen.dart';
 import 'util/app_colors.dart';
 
 void main() {

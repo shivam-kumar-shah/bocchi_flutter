@@ -1,20 +1,20 @@
 import 'dart:math';
 
-import 'package:anime_api/models/anime.dart';
-import 'package:anime_api/models/source.dart';
-import 'package:anime_api/repos/api_repo.dart';
-import 'package:anime_api/util/app_colors.dart';
-import 'package:anime_api/providers/user_preferences.dart';
-import 'package:anime_api/screens/details_screen.dart';
-import 'package:anime_api/widgets/custom_player.dart';
-import 'package:anime_api/widgets/custom_tile.dart';
-import 'package:anime_api/widgets/hero_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 
+import '../models/anime.dart';
 import '../models/enums.dart';
 import '../models/episode.dart';
+import '../models/source.dart';
+import '../providers/user_preferences.dart';
+import '../repositories/api_repo.dart';
+import '../util/app_colors.dart';
+import '../widgets/custom_player.dart';
+import '../widgets/custom_tile.dart';
+import '../widgets/hero_image.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   final Anime anime;
@@ -72,7 +72,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         isLoading = false;
       });
     } catch (err) {
-      print(err);
+      if (kDebugMode) {
+        print(err);
+      }
       setState(() {
         hasError = true;
       });

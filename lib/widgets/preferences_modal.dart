@@ -1,8 +1,8 @@
-import 'package:anime_api/providers/user_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/enums.dart';
+import '../providers/user_preferences.dart';
 
 class PreferencesModal extends StatelessWidget {
   const PreferencesModal({super.key});

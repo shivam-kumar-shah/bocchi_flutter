@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'anime.dart';
 
 class AnimeHistory {

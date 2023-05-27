@@ -1,11 +1,12 @@
-import 'package:anime_api/models/source.dart';
-import 'package:anime_api/providers/user_preferences.dart';
-import 'package:anime_api/widgets/custom_controls.dart';
 import 'package:chewie/chewie.dart';
 import "package:flutter/material.dart";
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
+
+import '../models/source.dart';
+import '../providers/user_preferences.dart';
+import 'custom_controls.dart';
 
 class CustomPlayer extends StatefulWidget {
   final List<Source> streams;

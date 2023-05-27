@@ -1,4 +1,4 @@
-import 'package:anime_api/util/constants.dart';
+import '../util/constants.dart';
 
 class Episode {
   final String id;

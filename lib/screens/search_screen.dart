@@ -1,12 +1,12 @@
-import 'package:anime_api/providers/user_preferences.dart';
-import 'package:anime_api/repos/api_repo.dart';
-import 'package:anime_api/widgets/bocchi_rich_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 
 import '../models/anime.dart';
+import '../providers/user_preferences.dart';
+import '../repositories/api_repo.dart';
 import '../util/app_colors.dart';
+import '../widgets/bocchi_rich_text.dart';
 import '../widgets/preferences_modal.dart';
 import '../widgets/search_card.dart';
 

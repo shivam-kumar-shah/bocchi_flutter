@@ -1,8 +1,8 @@
-import 'package:anime_api/widgets/bocchi_rich_text.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/user_preferences.dart';
+import '../widgets/bocchi_rich_text.dart';
 import '../widgets/preferences_modal.dart';
 import '../widgets/row_item.dart';
 

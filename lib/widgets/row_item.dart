@@ -1,10 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/anime.dart';
 import '../providers/user_preferences.dart';
 import '../screens/details_screen.dart';
 import '../widgets/hero_image.dart';
-import 'package:flutter/material.dart';
 
 class RowItem extends StatelessWidget {
   final Anime anime;

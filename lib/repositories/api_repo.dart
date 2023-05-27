@@ -3,10 +3,10 @@ import 'dart:convert' show json;
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:http/http.dart' show get;
 
+import '../models/anime.dart';
 import '../models/enums.dart';
 import '../models/episode.dart';
 import '../models/source.dart';
-import '../models/anime.dart';
 import '../util/constants.dart';
 import "animepahe_scrapper.dart";
 

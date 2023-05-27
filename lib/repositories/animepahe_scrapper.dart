@@ -1,10 +1,10 @@
 import 'dart:convert';
 
-import 'package:anime_api/models/episode.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
-import 'package:http/http.dart' show get;
 import 'package:html/parser.dart' as html;
+import 'package:http/http.dart' show get;
 
+import '../models/episode.dart';
 import '../models/source.dart';
 
 class AnimeScrapper {
