@@ -15,10 +15,10 @@ class DBHelper {
       path,
       onCreate: (db, version) async {
         await db.execute(
-          "CREATE TABLE $tableName (id TEXT PRIMARY KEY, data TEXT)",
+          "CREATE TABLE $tableName (id TEXT PRIMARY KEY, releaseDate INTEGER, genreList TEXT, type TEXT, description TEXT, relationType TEXT, status TEXT, rating INTEGER, totalEpisodes INTEGER, cover TEXT, image TEXT, titleList TEXT, season TEXT)",
         );
         await db.execute(
-          "CREATE TABLE $historyTable (id TEXT PRIMARY KEY, data TEXT, position INTEGER, episode INTEGER)",
+          "CREATE TABLE $historyTable (id TEXT PRIMARY KEY, releaseDate INTEGER, genreList TEXT, type TEXT, description TEXT, relationType TEXT, status TEXT, rating INTEGER, totalEpisodes INTEGER, cover TEXT, image TEXT, titleList TEXT, season TEXT, position INTEGER, episode INTEGER)",
         );
         await db.execute(
           "CREATE TABLE $searchHistory (search_query TEXT PRIMARY KEY)",

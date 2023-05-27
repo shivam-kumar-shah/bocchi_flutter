@@ -72,10 +72,14 @@ class AnimeScrapper {
       "page": page.toString(),
     });
     final response = await get(url);
-    final List<Map<String, dynamic>> data =
-        json.decode(response.body)["data"] ?? [];
+    final List<dynamic> data = json.decode(response.body)["data"] ?? [];
     if (data.isEmpty) return [];
-    return data.map((dataMap) => Episode.fromJSON(dataMap: dataMap)).toList();
+    return data
+        .map((dataMap) => Episode.fromJSON(dataMap: {
+              ...dataMap,
+              "anime_id": animeId,
+            }))
+        .toList();
   }
 
   static Future<List<Source>> fetchAnimepaheEpisodesSources({

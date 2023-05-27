@@ -66,7 +66,6 @@ class LibraryScreen extends StatelessWidget {
                           .toList()[index];
                       return RowItem(
                         anime: animeHistory.anime,
-                        callback: () {},
                       );
                     },
                     itemCount:
@@ -110,7 +109,6 @@ class LibraryScreen extends StatelessWidget {
                       ).getWatchlist[index];
                       return RowItem(
                         anime: anime,
-                        callback: () {},
                       );
                     },
                     itemCount:

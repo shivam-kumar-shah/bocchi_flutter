@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:anime_api/models/anime.dart';
+import 'package:anime_api/models/source.dart';
 import 'package:anime_api/repos/api_repo.dart';
 import 'package:anime_api/util/app_colors.dart';
 import 'package:anime_api/providers/user_preferences.dart';
@@ -35,7 +36,7 @@ class VideoPlayerScreen extends StatefulWidget {
 
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   final ScrollController _controller = ScrollController();
-  List<dynamic>? videoSources;
+  List<Source>? videoSources;
   int? currentEpisode;
   bool isLoading = true;
   bool hasError = false;
@@ -64,16 +65,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     }
     try {
       final response = await APIRepo.getVideoSources(
-        episodeID: widget.episodeList
-            .firstWhere((element) => element.episode == currentEpisode)
-            .id,
-        animeID: widget.anime.id,
-      );
+          episode: widget.episodeList
+              .firstWhere((element) => element.episode == currentEpisode));
       setState(() {
         videoSources = response;
         isLoading = false;
       });
     } catch (err) {
+      print(err);
       setState(() {
         hasError = true;
       });
@@ -187,23 +186,15 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                   child: Flex(
                     direction: Axis.horizontal,
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          MaterialPageRoute(
-                            builder: (context) => DetailsScreen(
-                              anime: widget.anime,
-                            ),
-                          );
-                        },
-                        child: HeroImage(
-                          imageUrl: widget.anime.posterImg,
-                          tag: widget.anime.id,
-                        ),
+                      HeroImage(
+                        imageUrl: widget.anime.coverImg,
+                        tag: widget.anime.id,
                       ),
                       const SizedBox(
                         width: 10,
                       ),
                       Flexible(
+                        fit: FlexFit.loose,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

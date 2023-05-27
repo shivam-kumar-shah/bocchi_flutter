@@ -1,6 +1,6 @@
 class Source {
   final String url;
-  final int resolution;
+  final String resolution;
   final String? audio;
   final String? fansubGroup;
 
@@ -13,8 +13,8 @@ class Source {
 
   factory Source.fromJSON({required Map<String, dynamic> dataMap}) {
     return Source(
-      url: dataMap["url"],
-      resolution: dataMap["resolution"],
+      url: dataMap["url"].toString().replaceFirst("cache", "files"),
+      resolution: dataMap["resolution"].toString(),
       audio: dataMap["audio"],
       fansubGroup: dataMap["group"],
     );

@@ -1,3 +1,4 @@
+import 'package:anime_api/models/source.dart';
 import 'package:anime_api/providers/user_preferences.dart';
 import 'package:anime_api/widgets/custom_controls.dart';
 import 'package:chewie/chewie.dart';
@@ -7,7 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
 class CustomPlayer extends StatefulWidget {
-  final List<dynamic> streams;
+  final List<Source> streams;
   final Function callback;
   final int initialPosition;
   final VoidCallback nextEpisode;
@@ -26,46 +27,24 @@ class CustomPlayer extends StatefulWidget {
 }
 
 class _CustomPlayerState extends State<CustomPlayer> {
-  int? quality;
+  late Source currentSource;
   bool hasLoaded = false;
   bool hasError = false;
 
   VideoPlayerController? _videoPlayerController;
   ChewieController? _controller;
 
-  int getPreferredQuality() {
-    int preferredQuality = int.parse(
-      Provider.of<Watchlist>(
-        context,
-        listen: false,
-      ).preferredQuality,
-    );
-    final streams = widget.streams;
-    int index = 0;
-    for (int i = 0; i < streams.length; i++) {
-      final check = int.parse(streams[i]["resolution"]);
-      if (check == preferredQuality) {
-        index = i;
-        break;
-      }
-      if (check > preferredQuality) {
-        index = i;
-        break;
-      } else {
-        index = -1;
-      }
-    }
-    if (index == -1) {
-      index = streams.length - 1;
-    }
-    return index;
-  }
-
   @override
   void initState() {
-    int index = getPreferredQuality();
+    final resolution = Provider.of<Watchlist>(
+      context,
+      listen: false,
+    ).preferredQuality;
+    currentSource = widget.streams.firstWhere(
+      (element) => element.resolution == resolution,
+      orElse: () => widget.streams.last,
+    );
     initPlayer(
-      index: index,
       position: Duration(
         seconds: widget.initialPosition,
       ),
@@ -80,36 +59,24 @@ class _CustomPlayerState extends State<CustomPlayer> {
     super.dispose();
   }
 
-  Future<void> toggleQuality(int index) async {
+  Future<void> toggleSource({required Source newSource}) async {
+    if (newSource.url == currentSource.url) return;
     _controller?.exitFullScreen();
     _controller?.videoPlayerController.pause();
     final position = await _controller?.videoPlayerController.position;
     setState(() {
+      currentSource = newSource;
       hasLoaded = false;
     });
-    await initPlayer(index: index, position: position!);
+    await initPlayer(position: position!);
     return;
   }
 
   Future<void> initPlayer({
     required Duration position,
-    required int index,
   }) async {
-    setState(() {
-      quality = index;
-    });
-    var streams = widget.streams;
-
-    streams = streams.map((item) {
-      return {
-        ...item,
-        // "url":
-        //     "${item["url"].toString().substring(0, 15)}files${item["url"].toString().substring(20)}",
-        "url": item["url"].toString().replaceFirst("cache", "files"),
-      };
-    }).toList();
-
-    final url = Uri.parse(streams[quality!]["url"]);
+    final streams = widget.streams;
+    final url = Uri.parse(currentSource.url);
 
     _videoPlayerController = VideoPlayerController.contentUri(url);
 
@@ -170,43 +137,38 @@ class _CustomPlayerState extends State<CustomPlayer> {
               builder: (context) => SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ...(streams).asMap().entries.map((item) {
-                      int index = item.key;
-                      final height = item.value["resolution"];
-                      final audio = item.value["audio"];
-                      final streamInfo = item.value["streamInfo"];
-
-                      return ListTile(
-                        leading: Icon(
-                          Icons.check_rounded,
-                          color: quality == index
-                              ? Theme.of(context).colorScheme.onBackground
-                              : Colors.transparent,
-                        ),
-                        title: Text("$streamInfo \u2022 $audio"),
-                        onTap: () {
-                          toggleQuality(index);
-                          Navigator.of(context).pop();
-                        },
-                        trailing: height == 1080 || height == 720
-                            ? Icon(
-                                Icons.hd_outlined,
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onBackground,
-                              )
-                            : null,
-                      );
-                    }),
-                  ],
+                  children: widget.streams.map((source) {
+                    return ListTile(
+                      leading: Icon(
+                        Icons.check_rounded,
+                        color: currentSource.url == source.url
+                            ? Theme.of(context).colorScheme.onBackground
+                            : Colors.transparent,
+                      ),
+                      title: Text(
+                          "${source.fansubGroup} \u2022 ${source.audio} \u2022 ${source.resolution}"),
+                      onTap: () {
+                        toggleSource(newSource: source);
+                        Navigator.of(context).pop();
+                      },
+                      trailing: source.resolution == "1080" ||
+                              source.resolution == "720"
+                          ? Icon(
+                              Icons.hd_outlined,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onBackground,
+                            )
+                          : null,
+                    );
+                  }).toList(),
                 ),
               ),
             );
           },
           iconData: Icons.settings,
           title: "Quality",
-          subtitle: "${streams[quality!]["resolution"]}p",
+          subtitle: "${currentSource.resolution}p",
         ),
       ],
     );

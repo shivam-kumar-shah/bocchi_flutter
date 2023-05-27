@@ -1,4 +1,5 @@
 import 'package:anime_api/repos/api_repo.dart';
+import 'package:anime_api/screens/details_screen.dart';
 import 'package:anime_api/util/app_colors.dart';
 
 import '../models/anime.dart';
@@ -25,7 +26,6 @@ class _RowSliverState extends State<RowSliver> {
       setState(() {
         hasError = false;
       });
-      await Future.delayed(const Duration(milliseconds: 500));
       final result = await APIRepo.getLanding(landing: widget.option);
       setState(() {
         fetchedData = result;
@@ -92,7 +92,6 @@ class _RowSliverState extends State<RowSliver> {
                 ),
                 itemBuilder: (context, index) => RowItem(
                   anime: fetchedData![index],
-                  callback: () {},
                 ),
                 itemCount: fetchedData!.length,
               );

@@ -17,8 +17,7 @@ class APIRepo {
     try {
       final url = Uri.https(Constants.API_URL, "search/$title");
       final response = await get(url);
-      final List<Map<String, dynamic>> data =
-          json.decode(response.body)["results"];
+      final List<dynamic> data = json.decode(response.body)["results"];
       return data.map((dataMap) => Anime.fromJSON(dataMap: dataMap)).toList();
     } catch (err) {
       if (kDebugMode) {
@@ -43,15 +42,15 @@ class APIRepo {
   }
 
   static Future<List<Source>> getVideoSources({
-    required String episodeID,
-    required String animeID,
+    required Episode episode,
   }) async {
     try {
       return AnimeScrapper.fetchAnimepaheEpisodesSources(
-        animeID: animeID,
-        episodeID: episodeID,
+        animeID: episode.animeID.toString(),
+        episodeID: episode.id.toString(),
       );
     } catch (err) {
+      print(err);
       rethrow;
     }
   }
@@ -107,8 +106,7 @@ class APIRepo {
     try {
       final url = Uri.https(Constants.API_URL, landing.name);
       final response = await get(url);
-      final List<Map<String, dynamic>> data =
-          json.decode(response.body)["results"];
+      final List<dynamic> data = json.decode(response.body)["results"];
       return data.map((dataMap) => Anime.fromJSON(dataMap: dataMap)).toList();
     } catch (err) {
       if (kDebugMode) {

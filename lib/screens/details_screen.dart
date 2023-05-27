@@ -19,8 +19,10 @@ class DetailsScreen extends StatefulWidget {
   const DetailsScreen({
     super.key,
     required this.anime,
+    required this.hash,
   });
   final Anime anime;
+  final String hash;
   static const routeName = "/details";
 
   @override
@@ -50,13 +52,13 @@ class _DetailsScreenState extends State<DetailsScreen>
     setState(() {
       isLoading = true;
     });
+    final anime = fetchedAnime!;
+    final episodes = await APIRepo.getAllEpisodes(
+      title: anime.title,
+      releasedYear: anime.year,
+      season: anime.season,
+    );
     try {
-      final anime = fetchedAnime!;
-      final episodes = await APIRepo.getAllEpisodes(
-        title: anime.title,
-        releasedYear: anime.year,
-        season: anime.season,
-      );
       setState(() {
         episodeList = episodes;
       });
@@ -72,13 +74,13 @@ class _DetailsScreenState extends State<DetailsScreen>
   }
 
   void fetchData() async {
+    final result = await APIRepo.getInfo(
+      malID: widget.anime.id,
+    );
     try {
       setState(() {
         hasError = false;
       });
-      final result = await APIRepo.getInfo(
-        malID: widget.anime.id,
-      );
       setState(() {
         fetchedAnime = result;
       });
@@ -144,7 +146,7 @@ class _DetailsScreenState extends State<DetailsScreen>
                   Positioned.fill(
                     child: HeroImage(
                       imageUrl: anime.coverImg,
-                      tag: anime.id,
+                      tag: widget.hash,
                     ),
                   ),
                   Positioned.fill(
@@ -395,8 +397,7 @@ class _DetailsScreenState extends State<DetailsScreen>
                             child: Stack(
                               children: [
                                 RowItem(
-                                  anime: anime,
-                                  callback: () {},
+                                  anime: data,
                                 ),
                                 Positioned(
                                   top: 20,
@@ -466,8 +467,7 @@ class _DetailsScreenState extends State<DetailsScreen>
                             child: Stack(
                               children: [
                                 RowItem(
-                                  anime: anime,
-                                  callback: () {},
+                                  anime: data,
                                 ),
                                 Positioned(
                                   top: 20,

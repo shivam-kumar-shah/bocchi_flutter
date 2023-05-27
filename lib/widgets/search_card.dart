@@ -19,7 +19,6 @@ class SearchCard extends StatelessWidget {
         children: [
           RowItem(
             anime: anime,
-            callback: callback,
           ),
           Positioned(
             top: 20,

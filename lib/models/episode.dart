@@ -7,8 +7,10 @@ class Episode {
   final String? duration;
   final String? createdAt;
   final String? audio;
+  final String animeID;
 
   const Episode({
+    required this.animeID,
     required this.id,
     required this.episode,
     required this.image,
@@ -19,6 +21,7 @@ class Episode {
 
   factory Episode.fromJSON({required Map<String, dynamic> dataMap}) {
     return Episode(
+      animeID: dataMap["anime_id"].toString(),
       id: dataMap["session"],
       episode: dataMap["episode"],
       image: dataMap["snapshot"] ?? Constants.NOT_FOUND_IMAGE,

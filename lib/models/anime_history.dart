@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'anime.dart';
 
 class AnimeHistory {
@@ -16,7 +18,7 @@ class AnimeHistory {
       position: dataMap["position"],
       episode: dataMap["episode"],
       anime: Anime.fromJSON(
-        dataMap: dataMap["data"],
+        dataMap: dataMap,
       ),
     );
   }

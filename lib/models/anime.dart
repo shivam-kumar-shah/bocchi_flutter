@@ -10,11 +10,21 @@ class AnimeTitle {
     required this.engTitle,
   });
 
-  factory AnimeTitle.fromJSON({required Map<String, dynamic> dataMap}) {
+  factory AnimeTitle.fromJSON({required dynamic dataMap}) {
+    String? eng;
+    String? jp;
+    if (dataMap.runtimeType == String) {
+      jp = dataMap.toString().split('-')[0];
+      eng = dataMap.toString().split('-')[1];
+    }
     return AnimeTitle(
-      jpTitle: dataMap["romaji"] ?? dataMap["romaji"] ?? "Unknown",
-      engTitle: dataMap["english"] ?? dataMap["romaji"] ?? "Unknown",
+      jpTitle: jp ?? dataMap["romaji"] ?? dataMap["romaji"] ?? "Unknown",
+      engTitle: eng ?? dataMap["english"] ?? dataMap["romaji"] ?? "Unknown",
     );
+  }
+
+  String get toJSON {
+    return "$jpTitle-$engTitle";
   }
 
   String prefTitle(PrefferedTitle prefference) {
@@ -30,7 +40,6 @@ class AnimeTitle {
 class Anime {
   final AnimeTitle title;
   final String id;
-  final String posterImg;
   final String coverImg;
   final String status;
   final String? season;
@@ -48,7 +57,6 @@ class Anime {
     required this.season,
     required this.title,
     required this.id,
-    required this.posterImg,
     required this.coverImg,
     required this.episodes,
     required this.rating,
@@ -67,27 +75,32 @@ class Anime {
   }) {
     return Anime(
       season: dataMap["season"],
-      title: AnimeTitle.fromJSON(dataMap: dataMap["title"]),
-      id: dataMap["id"],
-      posterImg: dataMap["image"] ?? Constants.NOT_FOUND_IMAGE,
-      coverImg: dataMap["cover"] ?? Constants.NOT_FOUND_IMAGE,
-      episodes: int.parse(dataMap["totalEpisodes"] ?? "0"),
+      title: AnimeTitle.fromJSON(
+          dataMap: dataMap["title"] ?? dataMap["titleList"]),
+      id: dataMap["id"].toString(),
+      coverImg:
+          dataMap["image"] ?? dataMap["cover"] ?? Constants.NOT_FOUND_IMAGE,
+      episodes: dataMap["totalEpisodes"] ?? 0,
       rating: dataMap["rating"] ?? -1,
       status: dataMap["status"] ?? "Unknown",
       year: dataMap["releaseDate"] ?? -1,
       genres: dataMap["genres"] != null
-          ? dataMap["genres"].map((item) => item.toString()).toList()
-          : [],
+          ? (dataMap["genres"] as List<dynamic>)
+              .map((item) => item.toString())
+              .toList()
+          : dataMap["genreList"] != null
+              ? dataMap["genreList"].toString().split('-')
+              : [],
       type: dataMap["type"] ?? "Unknown",
       description: dataMap["description"] ?? "",
       relationType: dataMap["relationType"] ?? "Unknown",
       relations: dataMap["relations"] != null
-          ? dataMap["relations"]
+          ? (dataMap["relations"] as List<dynamic>)
               .map((dataMap) => Anime.fromJSON(dataMap: dataMap))
               .toList()
           : [],
       recommendations: dataMap["recommendations"] != null
-          ? dataMap["recommendations"]
+          ? (dataMap["recommendations"] as List<dynamic>)
               .map((dataMap) => Anime.fromJSON(dataMap: dataMap))
               .toList()
           : [],
@@ -97,23 +110,18 @@ class Anime {
   Map<String, dynamic> get toJSON {
     final jsonValue = {
       "id": id,
-      "data": {
-        "id": id,
-        "releaseDate": year,
-        "genres": genres,
-        "type": type,
-        "description": description,
-        "relationType": relationType,
-        "relations": [],
-        "recommendations": [],
-        "status": status,
-        "rating": rating,
-        "totalEpisodes": episodes,
-        "cover": coverImg,
-        "image": posterImg,
-        "title": title,
-        "season": season,
-      }
+      "releaseDate": year,
+      "genreList": genres.join('-'),
+      "type": type,
+      "description": description,
+      "relationType": relationType,
+      "status": status,
+      "rating": rating,
+      "totalEpisodes": episodes,
+      "cover": coverImg,
+      "image": coverImg,
+      "titleList": title.toJSON,
+      "season": season,
     };
     return jsonValue;
   }
