@@ -93,7 +93,7 @@ class Watchlist with ChangeNotifier {
 
   Future<void> addToHistory({
     required Anime anime,
-    required int episode,
+    required double episode,
     required int position,
   }) async {
     await DBHelper.insertHistory(

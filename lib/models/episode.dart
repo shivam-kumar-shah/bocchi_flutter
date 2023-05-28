@@ -2,7 +2,7 @@ import '../util/constants.dart';
 
 class Episode {
   final String id;
-  final int episode;
+  final double episode;
   final String image;
   final String? duration;
   final String? createdAt;
@@ -23,7 +23,7 @@ class Episode {
     return Episode(
       animeID: dataMap["anime_id"].toString(),
       id: dataMap["session"],
-      episode: dataMap["episode"],
+      episode: double.parse(dataMap["episode"].toString()),
       image: dataMap["snapshot"] ?? Constants.NOT_FOUND_IMAGE,
       duration: dataMap["duration"],
       audio: dataMap["audio"],

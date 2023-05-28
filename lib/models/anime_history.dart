@@ -2,7 +2,7 @@ import 'anime.dart';
 
 class AnimeHistory {
   final int position;
-  final int episode;
+  final double episode;
   final Anime anime;
 
   const AnimeHistory({
@@ -14,7 +14,7 @@ class AnimeHistory {
   factory AnimeHistory.fromJSON({required Map<String, dynamic> dataMap}) {
     return AnimeHistory(
       position: dataMap["position"],
-      episode: dataMap["episode"],
+      episode: double.parse(dataMap["episode"]),
       anime: Anime.fromJSON(
         dataMap: dataMap,
       ),

@@ -73,11 +73,12 @@ class _CustomPlayerState extends State<CustomPlayer> {
                   leading: Icon(
                     Icons.check_rounded,
                     color: currentSource.url == source.url
-                        ? Theme.of(context).colorScheme.onBackground
+                        ? Theme.of(context).colorScheme.primary
                         : Colors.transparent,
                   ),
                   title: Text(
-                      "${source.fansubGroup} \u2022 ${source.audio} \u2022 ${source.resolution}"),
+                    "${source.fansubGroup} \u2022 ${source.audio} \u2022 ${source.resolution}p",
+                  ),
                   onTap: () {
                     toggleSource(newSource: source);
                     Navigator.of(context).pop();
@@ -88,7 +89,7 @@ class _CustomPlayerState extends State<CustomPlayer> {
                               Icons.hd_outlined,
                               color: Theme.of(
                                 context,
-                              ).colorScheme.onBackground,
+                              ).colorScheme.primary,
                             )
                           : null,
                 );

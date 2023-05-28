@@ -17,7 +17,7 @@ import '../widgets/hero_image.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   final Anime anime;
-  final int episode;
+  final double episode;
   final List<Episode> episodeList;
   final int position;
   const VideoPlayerScreen({
@@ -36,12 +36,12 @@ class VideoPlayerScreen extends StatefulWidget {
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   final ScrollController _controller = ScrollController();
   List<Source>? videoSources;
-  int? currentEpisode;
+  double? currentEpisode;
   bool isLoading = true;
   bool hasError = false;
 
   Future<void> getEpisode({
-    int episode = 1,
+    double episode = 1,
     required int position,
   }) async {
     Provider.of<Watchlist>(
@@ -81,7 +81,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   }
 
   void scrollToEpisode({
-    int episode = 1,
+    double episode = 1,
     Duration duration = Duration.zero,
   }) {
     double position = 100 * ((episode - widget.episodeList[0].episode) * 1.0);
@@ -92,7 +92,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       min(position, _controller.position.maxScrollExtent),
       duration: duration == Duration.zero
           ? Duration(
-              milliseconds: min(3000, ((episode) * 60)),
+              milliseconds: min(3000, ((episode) * 60).toInt()),
             )
           : duration,
       curve: Curves.easeOut,
@@ -100,7 +100,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   }
 
   void callback(Duration position) {
-    int episode = currentEpisode ?? 1;
+    double episode = currentEpisode ?? 1;
     Provider.of<Watchlist>(
       context,
       listen: false,

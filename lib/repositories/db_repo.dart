@@ -18,7 +18,7 @@ class DBHelper {
           "CREATE TABLE $tableName (id TEXT PRIMARY KEY, releaseDate INTEGER, genreList TEXT, type TEXT, description TEXT, relationType TEXT, status TEXT, rating INTEGER, totalEpisodes INTEGER, cover TEXT, image TEXT, titleList TEXT, season TEXT)",
         );
         await db.execute(
-          "CREATE TABLE $historyTable (id TEXT PRIMARY KEY, releaseDate INTEGER, genreList TEXT, type TEXT, description TEXT, relationType TEXT, status TEXT, rating INTEGER, totalEpisodes INTEGER, cover TEXT, image TEXT, titleList TEXT, season TEXT, position INTEGER, episode INTEGER)",
+          "CREATE TABLE $historyTable (id TEXT PRIMARY KEY, releaseDate INTEGER, genreList TEXT, type TEXT, description TEXT, relationType TEXT, status TEXT, rating INTEGER, totalEpisodes INTEGER, cover TEXT, image TEXT, titleList TEXT, season TEXT, position INTEGER, episode REAL)",
         );
         await db.execute(
           "CREATE TABLE $searchHistory (search_query TEXT PRIMARY KEY)",
@@ -91,7 +91,7 @@ class DBHelper {
 
   static Future<int> insertHistory({
     required Anime anime,
-    required int episode,
+    required double episode,
     required int position,
   }) async {
     final sql = await openDB();
