@@ -1,3 +1,4 @@
+import 'package:anime_api/widgets/row_label.dart';
 import 'package:flutter/material.dart';
 
 import '../models/anime.dart';
@@ -20,28 +21,7 @@ class SearchCard extends StatelessWidget {
           RowItem(
             anime: anime,
           ),
-          Positioned(
-            top: 20,
-            right: 4,
-            child: FittedBox(
-              child: Container(
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.horizontal(
-                    left: Radius.circular(5),
-                  ),
-                  color: Colors.red,
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 5,
-                  vertical: 3,
-                ),
-                child: Text(
-                  anime.type,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ),
-            ),
-          ),
+          RowLabel(title: anime.type),
         ],
       ),
     );

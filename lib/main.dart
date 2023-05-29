@@ -1,3 +1,4 @@
+import 'package:anime_api/providers/landing_provider.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -44,8 +45,11 @@ class _MyAppState extends State<MyApp> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-    return ChangeNotifierProvider(
-        create: (context) => Watchlist(),
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (context) => Watchlist()),
+          ChangeNotifierProvider(create: (context) => LandingProvider()),
+        ],
         builder: (context, _) => FutureBuilder(
               future: Provider.of<Watchlist>(context, listen: false).fetchAll(),
               builder: (context, snapshot) {

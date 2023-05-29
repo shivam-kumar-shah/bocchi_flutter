@@ -9,10 +9,9 @@ class LandingProvider with ChangeNotifier {
   List<Anime> recent = [];
   List<Anime> popular = [];
 
-  bool isLoading = true;
-
   Future<void> fetchTrending() async {
     trending = await APIRepository.getLanding(landing: GetLanding.trending);
+
     notifyListeners();
   }
 
@@ -23,6 +22,7 @@ class LandingProvider with ChangeNotifier {
 
   Future<void> fetchPopular() async {
     popular = await APIRepository.getLanding(landing: GetLanding.popular);
+
     notifyListeners();
   }
 
@@ -30,18 +30,30 @@ class LandingProvider with ChangeNotifier {
     await fetchTrending();
     await fetchRecent();
     await fetchPopular();
-    isLoading = false;
     notifyListeners();
   }
 
   List<Anime> getData({required GetLanding landing}) {
-    switch (landing) {
-      case GetLanding.recent:
-        return recent;
-      case GetLanding.popular:
-        return popular;
-      default:
-        return trending;
+    try {
+      switch (landing) {
+        case GetLanding.recent:
+          if (recent.isEmpty) {
+            fetchRecent();
+          }
+          return recent;
+        case GetLanding.popular:
+          if (popular.isEmpty) {
+            fetchPopular();
+          }
+          return popular;
+        default:
+          if (trending.isEmpty) {
+            fetchTrending();
+          }
+          return trending;
+      }
+    } catch (err) {
+      rethrow;
     }
   }
 

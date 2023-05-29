@@ -14,6 +14,7 @@ import '../widgets/custom_tile.dart';
 import '../widgets/hero_image.dart';
 import '../widgets/info_pane.dart';
 import '../widgets/row_item.dart';
+import '../widgets/row_label.dart';
 
 class DetailsScreen extends StatefulWidget {
   const DetailsScreen({
@@ -398,30 +399,7 @@ class _DetailsScreenState extends State<DetailsScreen>
                                 RowItem(
                                   anime: data,
                                 ),
-                                Positioned(
-                                  top: 20,
-                                  right: 4,
-                                  child: FittedBox(
-                                    child: Container(
-                                      decoration: const BoxDecoration(
-                                        borderRadius: BorderRadius.horizontal(
-                                          left: Radius.circular(5),
-                                        ),
-                                        color: Colors.red,
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 5,
-                                        vertical: 3,
-                                      ),
-                                      child: Text(
-                                        data.relationType ?? "",
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium,
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                                RowLabel(title: data.relationType ?? ""),
                               ],
                             ),
                           );
@@ -468,30 +446,7 @@ class _DetailsScreenState extends State<DetailsScreen>
                                 RowItem(
                                   anime: data,
                                 ),
-                                Positioned(
-                                  top: 20,
-                                  right: 4,
-                                  child: FittedBox(
-                                    child: Container(
-                                      decoration: const BoxDecoration(
-                                        borderRadius: BorderRadius.horizontal(
-                                          left: Radius.circular(5),
-                                        ),
-                                        color: Colors.red,
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 5,
-                                        vertical: 3,
-                                      ),
-                                      child: Text(
-                                        data.type,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium,
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                                RowLabel(title: data.type)
                               ],
                             ),
                           );
