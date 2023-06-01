@@ -10,18 +10,29 @@ class LandingProvider with ChangeNotifier {
   List<Anime> popular = [];
 
   Future<void> fetchTrending() async {
-    trending = await APIRepository.getLanding(landing: GetLanding.trending);
-
+    try {
+      trending = await APIRepository.getLanding(landing: GetLanding.trending);
+    } catch (err) {
+      rethrow;
+    }
     notifyListeners();
   }
 
   Future<void> fetchRecent() async {
-    recent = await APIRepository.getLanding(landing: GetLanding.recent);
+    try {
+      recent = await APIRepository.getLanding(landing: GetLanding.recent);
+    } catch (err) {
+      rethrow;
+    }
     notifyListeners();
   }
 
   Future<void> fetchPopular() async {
-    popular = await APIRepository.getLanding(landing: GetLanding.popular);
+    try {
+      popular = await APIRepository.getLanding(landing: GetLanding.popular);
+    } catch (err) {
+      rethrow;
+    }
 
     notifyListeners();
   }

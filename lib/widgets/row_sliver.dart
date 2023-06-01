@@ -2,9 +2,7 @@ import 'package:anime_api/providers/landing_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../models/anime.dart';
 import '../models/enums.dart';
-import '../repositories/api_repo.dart';
 import '../util/app_colors.dart';
 import '../widgets/row_item.dart';
 

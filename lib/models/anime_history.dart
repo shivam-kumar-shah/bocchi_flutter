@@ -14,7 +14,7 @@ class AnimeHistory {
   factory AnimeHistory.fromJSON({required Map<String, dynamic> dataMap}) {
     return AnimeHistory(
       position: dataMap["position"],
-      episode: double.parse(dataMap["episode"]),
+      episode: double.parse(dataMap["episode"].toString()),
       anime: Anime.fromJSON(
         dataMap: dataMap,
       ),

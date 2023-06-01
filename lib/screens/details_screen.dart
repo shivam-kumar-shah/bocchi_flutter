@@ -101,9 +101,9 @@ class _DetailsScreenState extends State<DetailsScreen>
   }
 
   @override
-  void didChangeDependencies() {
+  void initState() {
     fetchData();
-    super.didChangeDependencies();
+    super.initState();
   }
 
   @override
