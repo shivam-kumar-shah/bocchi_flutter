@@ -1,6 +1,99 @@
-# Bocchi Flutter
+# bocchi.tv - Cross Platform Anime Streaming App
 
-So, basically this is an Anime streaming application. It uses `consumet` API under-the-hood for everything from searching to streaming. It uses `animepahe` as the stream provider and `gogoanime` for the info you see on the episode list, like episode title and episode description.
+![bocchi.tv Banner](https://github.com/shivam-kumar-shah/bocchi_flutter/assets/134827809/a7355fcf-5f8e-4e76-acf1-7be57d032f67)
+
+## Description
+
+Bocchi.tv is a cross-platform anime streaming application built using Flutter. It provides a seamless and user-friendly interface for anime enthusiasts to stream their favorite shows. This project is a labor of love and a true passion project. The app utilizes a self-hosted backend for data fetching and employs on-device web scraping using the HTML package to fetch stream URLs and episode lists from animepahe.com. The backend then processes the stream URLs into a usable format supported by Flutter.
+
+The application uses Provider as the state management library, SQLite as the on-device database for storing watch history and watchlist, and Consumit for some of the backend functionality.
+
+## Features
+
+- Stream anime episodes seamlessly.
+- Store watch history and create a watchlist.
+- Cross-platform compatibility for Android and iOS.
+
+## Technologies Used
+
+- Flutter
+- `provider` as a state management library
+- `html` package for web scraping
+- `sqllite` for on-device database
+- [consumet](https://github.com/consumet/consumet.ts) for backend integration
+
+## Backend
+
+Backend is hosted at - [bocchi.tv Backend](https://relieved-cyan-tuxedo.cyclic.app/)
+
+## Getting Started
+
+To run this project locally, follow these steps:
+
+1. Clone the repository:
+
+```bash
+  git clone https://github.com/shivam-kumar-shah/bocchi_flutter && cd bocchi_flutter
+```
+
+3. Install the required dependencies using:
+
+```bash
+   flutter pub get
+```
+
+3. Start the app on your preferred emulator or connected device using:
+
+```bash
+  flutter run
+```
+
+## Building the Application
+
+To build the Bocchi.tv application, follow these instructions:
+
+1. Open a terminal or command prompt.
+
+2. Navigate to the project directory:
+
+```bash
+  cd /path/to/bocchi.tv
+```
+3. To build a smaller bundle size optimized for specific device architectures, use the following command:
+
+```bash
+   flutter build --split-per-abi
+```
+
+> This command will generate separate APK files for different device architectures (arm64-v8a, armeabi-v7a, etc.). This is recommended for reducing the app size.
+
+4. If you prefer a larger bundle that is architecture-independent, use the following command:
+
+```bash
+  flutter build
+```
+
+> This command will generate a single APK file that can run on various device architectures. Keep in mind that this option may result in a larger app size.
+
+5. After the build process is complete, you can find the generated APK files in the `build/app/outputs/flutter-apk` directory.
+
+## Usage
+
+1. Open the application on your device.
+2. Browse the extensive anime library.
+3. Select your desired show and start streaming.
+
+## Contributing
+
+Contributions are welcome! If you have any ideas, bug fixes, or improvements, please open an issue or submit a pull request.
+
+## Contact
+
+For any inquiries or feedback, feel free to contact us at [shivam-kumar-shah@outlook.com](mailto:shivam-kumar-shah@outlook.com).
+
+---
+
+*Happy Streaming!* 📺✨
 
 ---
 
@@ -16,33 +109,3 @@ So, basically this is an Anime streaming application. It uses `consumet` API und
 </div>
 
 ---
-
-## Possible improvement
-
-I chose gogoanime to display episode info because animepahe, simply, has no data about episodes, whatsoever. I would have gone with gogoanime's stream service as well, only if it was not broken to begin with. Well, animepahe was also broken but with a little string manipulation, I got it to work😅.
-
-If you were to sacrifice info about episodes like their title and description, this app can be made a LOT faster. Since, I have to fetch both animepahe and gogoanime endpoints, the app is a little slow, but nothing deal-breaking.
-
----
-
-## Fixing the consumet 403 error
-
-The stream sources from consumet are plain broken. Well, zoro is working but you'll have to manually manage all the soft-subtitles. Well, I got animepahe to work!
-
-TLDR; if you get a url that looks something like this from animepahe-
-
-```
-https://eu-{some-three-digit-code}.cache.nextcdn.org/hls/10/08/.../owo.m3u8
-
-https://na-{some-three-digit-code}.cache.nextcdn.org/hls/10/08/.../owo.m3u8
-```
-
-just replace the `.cache.` segment with `.files.` It will work like a charm! Finally, it should look something like this-
-
-```
-https://eu-{some-three-digit-code}.files.nextcdn.org/hls/10/08/.../owo.m3u8
-
-https://na-{some-three-digit-code}.files.nextcdn.org/hls/10/08/.../owo.m3u8
-```
----
-That's all, Bye 👋👋👋
